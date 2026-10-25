@@ -5,8 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,64 +56,71 @@ fun SylvenOSApp() {
     val context = LocalContext.current
     var currentDestination by remember { mutableStateOf(value = AppDestination.SPLASH) }
 
-    Crossfade(
-        targetState = currentDestination,
-        animationSpec = tween(durationMillis = 400),
+    Surface(
         modifier = Modifier.fillMaxSize(),
-        label = "AppScreenTransition",
-    ) { destination ->
-        when (destination) {
-            AppDestination.SPLASH -> {
-                SplashScreen {
-                    //Launch -> Splash Screen -> Lands on Home Screen
-                    currentDestination = AppDestination.HOME
-                }
-            }
-            AppDestination.HOME -> {
-                HomeScreen {
-                    // Step 2: Clicking "App Lock and Hide" -> Check 3 required permissions
-                    currentDestination = if (hasAllRequiredPermissions(context)) {
-                        AppDestination.APP_LOCK_HIDE_HOME
-                    } else {
-                        AppDestination.PERMISSION
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        Crossfade(
+            targetState = currentDestination,
+            animationSpec = tween(
+                durationMillis = 250,
+                easing = FastOutSlowInEasing,
+            ),
+            modifier = Modifier.fillMaxSize(),
+            label = "AppScreenTransition",
+        ) { destination ->
+            when (destination) {
+                AppDestination.SPLASH -> {
+                    SplashScreen {
+                        // Launch -> Splash Screen -> Lands on Home Screen
+                        currentDestination = AppDestination.HOME
                     }
                 }
-            }
-            AppDestination.PERMISSION -> {
-                PermissionScreen {
-                    // Step 3: Once all 3 permissions allowed -> Enter AppLockHideHome
-                    currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                AppDestination.HOME -> {
+                    HomeScreen {
+                        // Clicking "App Lock and Hide" -> Check 3 required permissions
+                        currentDestination = if (hasAllRequiredPermissions(context)) {
+                            AppDestination.APP_LOCK_HIDE_HOME
+                        } else {
+                            AppDestination.PERMISSION
+                        }
+                    }
                 }
-            }
-            AppDestination.APP_LOCK_HIDE_HOME -> {
-                // Step 4: AppLockHideHome showing 3 options: 1. Lock Type, 2. App Lock, 3. Hide App
-                AppLockHideHome(
-                    onBackClick = {
-                        currentDestination = AppDestination.HOME
-                    },
-                    onLockTypeClick = {
-                        currentDestination = AppDestination.LOCK_TYPE
-                    },
-                    onAppLockClick = {
-                        currentDestination = AppDestination.APP_LOCK
-                    },
-                ) {
-                    currentDestination = AppDestination.HIDE_APP
+                AppDestination.PERMISSION -> {
+                    PermissionScreen {
+                        // Once all 3 permissions allowed -> Enter AppLockHideHome
+                        currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                    }
                 }
-            }
-            AppDestination.LOCK_TYPE -> {
-                LockType {
-                    currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                AppDestination.APP_LOCK_HIDE_HOME -> {
+                    AppLockHideHome(
+                        onBackClick = {
+                            currentDestination = AppDestination.HOME
+                        },
+                        onLockTypeClick = {
+                            currentDestination = AppDestination.LOCK_TYPE
+                        },
+                        onAppLockClick = {
+                            currentDestination = AppDestination.APP_LOCK
+                        },
+                    ) {
+                        currentDestination = AppDestination.HIDE_APP
+                    }
                 }
-            }
-            AppDestination.APP_LOCK -> {
-                AppLock {
-                    currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                AppDestination.LOCK_TYPE -> {
+                    LockType {
+                        currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                    }
                 }
-            }
-            AppDestination.HIDE_APP -> {
-                HideApp {
-                    currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                AppDestination.APP_LOCK -> {
+                    AppLock {
+                        currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                    }
+                }
+                AppDestination.HIDE_APP -> {
+                    HideApp {
+                        currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                    }
                 }
             }
         }

@@ -44,9 +44,7 @@ import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-/**
- * Main Home Screen Dashboard for Sylven Tools.
- */
+// Main Home Screen Dashboard for Sylven Tools
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -92,7 +90,7 @@ fun HomeScreen(
                 .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            //App Lock and Hide
+            // App Lock and Hide
             HomeFeatureCard(
                 title = "App Lock and Hide",
                 description = "",
@@ -109,7 +107,7 @@ fun HomeScreen(
                 accentColor = Color(0xFF10B981),
             ) {}
 
-            //Secure Vault - Planned
+            // Secure Vault - Planned
             HomeFeatureCard(
                 title = "Secure Vault",
                 description = "Planned",
@@ -120,9 +118,7 @@ fun HomeScreen(
     }
 }
 
-/**
- * Modern Feature Card Item for Dashboard listing with ImageVector.
- */
+// Feature Card Item with ImageVector
 @Composable
 fun HomeFeatureCard(
     title: String,
@@ -203,9 +199,7 @@ fun HomeFeatureCard(
     }
 }
 
-/**
- * Modern Feature Card Item for Dashboard listing with Painter.
- */
+// Feature Card Item with Painter
 @Composable
 fun HomeFeatureCardWithPainter(
     title: String,

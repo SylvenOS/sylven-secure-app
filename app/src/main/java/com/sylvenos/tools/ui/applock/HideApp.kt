@@ -53,7 +53,7 @@ import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-
+// Hide App Screen listing installed apps with hide/disguise switches
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HideApp(
@@ -155,9 +155,7 @@ fun HideApp(
     }
 }
 
-/**
- * Individual Hide App Item Card.
- */
+// Individual Hide App Item Card
 @Composable
 fun HideAppItemCard(
     appInfo: AppInfoItem,
