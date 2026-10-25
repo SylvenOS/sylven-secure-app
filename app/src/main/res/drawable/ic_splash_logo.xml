@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="288"
+    android:viewportHeight="288">
+
+    <!-- Outer Glow Circle -->
+    <path
+        android:pathData="M144,144m-72,0a72,72 0 1,1 144,0a72,72 0 1,1 -144,0"
+        android:fillColor="#1E293B" />
+
+    <!-- Shield Background -->
+    <path
+        android:pathData="M144,90 L184,106 V142 C184,168 167,192 144,200 C121,192 104,168 104,142 V106 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="104"
+                android:startY="90"
+                android:endX="184"
+                android:endY="200"
+                android:type="linear">
+                <item android:color="#FF0EA5E9" android:offset="0.0" />
+                <item android:color="#FF0284C7" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Inner Stylized "S" Emblem -->
+    <path
+        android:pathData="M156,118 C150,114 138,116 135,124 C132,132 156,134 153,146 C150,158 134,158 130,154"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+
+</vector>

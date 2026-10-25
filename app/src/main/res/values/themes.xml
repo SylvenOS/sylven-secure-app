@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Base app theme — uses built-in Android NoActionBar so AAPT can resolve it.
-         Compose Material3 theming is applied at runtime via SylvenSecureTheme. -->
-    <style name="Theme.SylvenSecure" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">@color/sylven_navy</item>
-        <item name="android:statusBarColor">@color/sylven_navy</item>
-        <item name="android:navigationBarColor">@color/sylven_navy</item>
-        <item name="android:windowLightStatusBar">false</item>
-    </style>
+    <style name="Theme.SylvenSecure" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <!-- Splash activity theme: prevents any white flash before Compose renders -->
-    <style name="Theme.SylvenSecure.Splash" parent="Theme.SylvenSecure">
-        <item name="android:windowBackground">@color/sylven_navy</item>
-        <item name="android:windowIsTranslucent">false</item>
+    <!-- Splash Screen Theme -->
+    <style name="Theme.SylvenSecure.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.SylvenSecure</item>
     </style>
 
 </resources>
