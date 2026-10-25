@@ -53,9 +53,6 @@ import androidx.compose.ui.unit.sp
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-/**
- * App Lock Screen listing installed apps with lock switches.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLock(
@@ -160,9 +157,7 @@ fun AppLock(
     }
 }
 
-/**
- * Individual App Lock Item Card.
- */
+//Individual App Lock Item Card
 @Composable
 fun AppLockItemCard(
     appInfo: AppInfoItem,

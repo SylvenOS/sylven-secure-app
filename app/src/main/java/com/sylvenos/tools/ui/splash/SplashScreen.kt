@@ -36,11 +36,8 @@ import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
-/**
-Splash Screen component, displays animated logo, typography, and progress indicator.
-Automatically picks to Light/Dark system mode with smooth transitions.
-@param onSplashFinished Callback invoked when the splash animation completes.
- */
+//Splash Screen component, displays animated logo, typography, and progress indicator
+//Automatically picks to Light/Dark system mode with smooth transitions
 @Composable
 fun SplashScreen(
     onSplashFinished: () -> Unit,

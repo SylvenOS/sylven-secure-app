@@ -46,12 +46,6 @@ import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-/**
- * App Lock and Hide Main Home Screen showing 3 core options:
- * 1. Lock Type
- * 2. App Lock
- * 3. Hide App
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLockHideHome(
@@ -96,8 +90,8 @@ fun AppLockHideHome(
         ) {
             // Option 1: Lock Type
             OptionCard(
-                title = "1. Lock Type",
-                description = "Set or change PIN, Pattern, or Biometric lock type.",
+                title = "Lock Type",
+                description = "Change lock types",
                 icon = Icons.Outlined.Lock,
                 accentColor = BluePrimary,
                 onClick = onLockTypeClick,
@@ -105,8 +99,8 @@ fun AppLockHideHome(
 
             // Option 2: App Lock
             OptionCard(
-                title = "2. App Lock",
-                description = "Select and lock installed private applications.",
+                title = "App Lock",
+                description = "Lock/Unlock Apps",
                 icon = Icons.Default.Lock,
                 accentColor = Color(0xFF10B981),
                 onClick = onAppLockClick,
@@ -114,8 +108,8 @@ fun AppLockHideHome(
 
             // Option 3: Hide App
             OptionCardWithPainter(
-                title = "3. Hide App",
-                description = "Hide or disguise application launcher icons.",
+                title = "Hide App",
+                description = "Hide/Unhide Apps",
                 painter = painterResource(id = R.drawable.ic_hide_app),
                 accentColor = Color(0xFF8B5CF6),
                 onClick = onHideAppClick,

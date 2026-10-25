@@ -56,17 +56,23 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
+                    Row(
+                        verticalAlignment = Alignment.Bottom,
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
                         Text(
                             text = "Sylven Tools",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
+                        Spacer(modifier = Modifier.width(10.dp))
                         Text(
                             text = "Open Source",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
                             color = BluePrimary,
+                            modifier = Modifier.padding(bottom = 2.dp),
                         )
                     }
                 },
@@ -86,26 +92,26 @@ fun HomeScreen(
                 .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // 1. App Lock and Hide
+            //App Lock and Hide
             HomeFeatureCard(
-                title = "1. App Lock and Hide",
-                description = "Lock apps with PIN/Pattern or hide app launcher icons.",
+                title = "App Lock and Hide",
+                description = "",
                 icon = Icons.Default.Lock,
                 accentColor = BluePrimary,
                 onClick = onAppLockHideClick,
             )
 
-            // 2. WiFi Security - Planned
+            // WiFi Security - Planned
             HomeFeatureCardWithPainter(
-                title = "2. WiFi Security",
+                title = "WiFi Security",
                 description = "Planned",
                 painter = painterResource(id = R.drawable.ic_wifi_security),
                 accentColor = Color(0xFF10B981),
             ) {}
 
-            // 3. Secure Vault - Planned
+            //Secure Vault - Planned
             HomeFeatureCard(
-                title = "3. Secure Vault",
+                title = "Secure Vault",
                 description = "Planned",
                 icon = Icons.Outlined.Lock,
                 accentColor = Color(0xFF8B5CF6),
@@ -120,7 +126,7 @@ fun HomeScreen(
 @Composable
 fun HomeFeatureCard(
     title: String,
-    description: String,
+    description: String = "",
     icon: ImageVector,
     accentColor: Color,
     onClick: () -> Unit,
@@ -174,14 +180,15 @@ fun HomeFeatureCard(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = description,
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 18.sp,
-                    )
+                    if (description.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = description,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 18.sp,
+                        )
+                    }
                 }
             }
 
@@ -202,7 +209,7 @@ fun HomeFeatureCard(
 @Composable
 fun HomeFeatureCardWithPainter(
     title: String,
-    description: String,
+    description: String = "",
     painter: Painter,
     accentColor: Color,
     onClick: () -> Unit,
@@ -256,14 +263,15 @@ fun HomeFeatureCardWithPainter(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = description,
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 18.sp,
-                    )
+                    if (description.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = description,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 18.sp,
+                        )
+                    }
                 }
             }
 
