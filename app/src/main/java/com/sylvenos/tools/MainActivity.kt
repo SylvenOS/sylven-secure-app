@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.sylvenos.tools.ui.applock.AppLockHideScreen
 import com.sylvenos.tools.ui.home.HomeScreen
 import com.sylvenos.tools.ui.permission.PermissionScreen
 import com.sylvenos.tools.ui.permission.hasAllRequiredPermissions
@@ -25,6 +26,7 @@ enum class AppDestination {
     SPLASH,
     PERMISSION,
     HOME,
+    APP_LOCK_HIDE,
 }
 
 class MainActivity : ComponentActivity() {
@@ -47,7 +49,7 @@ fun SylvenOSApp() {
 
     Crossfade(
         targetState = currentDestination,
-        animationSpec = tween(durationMillis = 500),
+        animationSpec = tween(durationMillis = 400),
         modifier = Modifier.fillMaxSize(),
         label = "AppScreenTransition",
     ) { destination ->
@@ -67,7 +69,18 @@ fun SylvenOSApp() {
                 }
             }
             AppDestination.HOME -> {
-                HomeScreen()
+                HomeScreen(
+                    onAppLockHideClick = {
+                        currentDestination = AppDestination.APP_LOCK_HIDE
+                    },
+                )
+            }
+            AppDestination.APP_LOCK_HIDE -> {
+                AppLockHideScreen(
+                    onBackClick = {
+                        currentDestination = AppDestination.HOME
+                    },
+                )
             }
         }
     }
