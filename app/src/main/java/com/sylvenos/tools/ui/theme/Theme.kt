@@ -41,9 +41,7 @@ private val LightColorScheme = lightColorScheme(
     onSurface = LightOnSurface,
 )
 
-/**
- * SylvenSecure Theme automatically responds to system Light / Dark mode.
- */
+// SylvenSecure Theme automatically responds to system Light / Dark mode
 @Composable
 fun SylvenSecureTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -51,7 +49,7 @@ fun SylvenSecureTheme(
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
-        (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) -> {
+        (dynamicColor && Build.VERSION.SDK_INT >= 31) -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
@@ -63,6 +61,11 @@ fun SylvenSecureTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
+            @Suppress("DEPRECATION")
+            window.statusBarColor = android.graphics.Color.TRANSPARENT
+            @Suppress("DEPRECATION")
+            window.navigationBarColor = android.graphics.Color.TRANSPARENT
+
             val insetsController = WindowCompat.getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = !darkTheme
             insetsController.isAppearanceLightNavigationBars = !darkTheme

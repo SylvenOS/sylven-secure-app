@@ -46,6 +46,7 @@ import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
+// Main App Lock and Hide Home Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLockHideHome(
@@ -118,9 +119,7 @@ fun AppLockHideHome(
     }
 }
 
-/**
- * Individual Option Card Item with ImageVector.
- */
+// Individual Option Card Item with ImageVector
 @Composable
 fun OptionCard(
     title: String,
@@ -200,9 +199,7 @@ fun OptionCard(
     }
 }
 
-/**
- * Individual Option Card Item with Painter.
- */
+// Individual Option Card Item with Painter
 @Composable
 fun OptionCardWithPainter(
     title: String,

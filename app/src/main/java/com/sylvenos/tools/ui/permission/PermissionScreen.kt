@@ -53,9 +53,7 @@ import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-/**
- * Checks if Usage Access (PACKAGE_USAGE_STATS) permission is granted.
- */
+// Checks if Usage Access (PACKAGE_USAGE_STATS) permission is granted
 fun hasUsageAccessPermission(context: Context): Boolean {
     val appOps = (context.getSystemService(Context.APP_OPS_SERVICE) as? AppOpsManager) ?: return false
     val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -76,24 +74,18 @@ fun hasUsageAccessPermission(context: Context): Boolean {
     return mode == AppOpsManager.MODE_ALLOWED
 }
 
-/**
- * Checks if Display Over Other Apps (SYSTEM_ALERT_WINDOW) permission is granted.
- */
+// Checks if Display Over Other Apps (SYSTEM_ALERT_WINDOW) permission is granted
 fun hasOverlayPermission(context: Context): Boolean {
     return Settings.canDrawOverlays(context)
 }
 
-/**
- * Checks if Battery Optimization is disabled for this app to ensure smooth background operation.
- */
+// Checks if Battery Optimization is disabled for this app
 fun isBatteryOptimizationIgnored(context: Context): Boolean {
     val powerManager = (context.getSystemService(Context.POWER_SERVICE) as? PowerManager) ?: return true
     return powerManager.isIgnoringBatteryOptimizations(context.packageName)
 }
 
-/**
- * Requests system prompt to disable battery optimization.
- */
+// Requests system prompt to disable battery optimization
 @SuppressLint("BatteryLife")
 fun requestDisableBatteryOptimization(context: Context) {
     try {
@@ -108,18 +100,14 @@ fun requestDisableBatteryOptimization(context: Context) {
     }
 }
 
-/**
- * Checks if all 3 required permissions for App Lock are granted.
- */
+// Checks if all 3 required permissions for App Lock are granted
 fun hasAllRequiredPermissions(context: Context): Boolean {
     return hasUsageAccessPermission(context) &&
             hasOverlayPermission(context) &&
             isBatteryOptimizationIgnored(context)
 }
 
-/**
- * Permission Required Screen matching the design and requirements.
- */
+// Permission Required Screen
 @Composable
 fun PermissionScreen(
     onAllPermissionsGranted: () -> Unit,
@@ -236,7 +224,7 @@ fun PermissionScreen(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
-            // Bottom Action Button: Continue to App (Dummy/Disabled until ALL 3 granted)
+            // Bottom Action Button: Continue to App (Disabled until ALL 3 granted)
             Button(
                 onClick = {
                     if (areAllPermissionsGranted) {
@@ -265,9 +253,7 @@ fun PermissionScreen(
     }
 }
 
-/**
- * Individual Permission Item Card.
- */
+// Individual Permission Item Card
 @Composable
 fun PermissionCard(
     title: String,
