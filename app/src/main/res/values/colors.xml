@@ -3,9 +3,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Native Splash Screen Colors (Light Mode) -->
-    <color name="splash_background">#F8FAFC</color>
+    <!-- Native Splash Screen Colors (Light Theme - Warm #FBEFA6) -->
+    <color name="splash_background">#FBEFA6</color>
     <color name="splash_primary">#258CF4</color>
-    <color name="splash_circle_bg">#E2E8F0</color>
-    <color name="shield_light_fill">#F1F5F9</color>
+    <color name="splash_circle_bg">#F3E78E</color>
+    <color name="shield_light_fill">#FFFBEA</color>
 </resources>

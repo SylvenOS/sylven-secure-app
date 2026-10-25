@@ -62,7 +62,7 @@ fun SylvenOSApp() {
         when (destination) {
             AppDestination.SPLASH -> {
                 SplashScreen {
-                    // Step 1: Launch -> Splash Screen -> Lands directly on Home Screen
+                    //Launch -> Splash Screen -> Lands on Home Screen
                     currentDestination = AppDestination.HOME
                 }
             }

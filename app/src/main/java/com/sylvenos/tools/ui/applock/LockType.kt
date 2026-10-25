@@ -53,9 +53,7 @@ enum class LockTypeMode {
     BIOMETRIC,
 }
 
-/**
- * Lock Type Selection Screen.
- */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LockType(
