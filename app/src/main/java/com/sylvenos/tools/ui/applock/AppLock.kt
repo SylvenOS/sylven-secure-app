@@ -1,5 +1,6 @@
 package com.sylvenos.tools.ui.applock
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,7 +37,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,26 +56,32 @@ import androidx.compose.ui.unit.sp
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-// App Lock Screen matching the project auto-theme and grouped card styling
+// App Lock Screen showing real installed apps with auto-theme styling
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLock(
     onBackClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
+    val realApps = remember { mutableStateListOf<InstalledAppItem>() }
 
-    val lockedStateMap = remember {
-        mutableStateMapOf<String, Boolean>().apply {
-            put("com.whatsapp", value = true)
-            put("com.google.android.apps.photos", value = true)
-        }
+    // Fetch real installed apps on startup
+    LaunchedEffect(Unit) {
+        val apps = getInstalledApps(context)
+        realApps.clear()
+        realApps.addAll(apps)
     }
 
-    val filteredApps = remember(searchQuery) {
+    val lockedStateMap = remember {
+        mutableStateMapOf<String, Boolean>()
+    }
+
+    val filteredApps = remember(searchQuery, realApps.size) {
         if (searchQuery.isBlank()) {
-            SampleAppList
+            realApps
         } else {
-            SampleAppList.filter {
+            realApps.filter {
                 it.appName.contains(searchQuery, ignoreCase = true) ||
                         it.packageName.contains(searchQuery, ignoreCase = true)
             }
@@ -84,7 +93,7 @@ fun AppLock(
             TopAppBar(
                 title = {
                     Text(
-                        text = "App lock",
+                        text = "App Lock",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -116,7 +125,7 @@ fun AppLock(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { query -> searchQuery = query },
-                placeholder = { Text("Search apps...") },
+                placeholder = { Text("Search apps") },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -136,7 +145,7 @@ fun AppLock(
                 ),
             )
 
-            // Grouped Card Surface for Apps
+            // Grouped Card Surface for Real Apps
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
@@ -170,13 +179,15 @@ fun AppLock(
     }
 }
 
-// Individual App Lock Row inside Grouped Card
+// Individual Real App Lock Row inside Grouped Card
 @Composable
 fun AppLockRow(
-    appInfo: AppInfoItem,
+    appInfo: InstalledAppItem,
     isLocked: Boolean,
     onToggleChange: (Boolean) -> Unit,
 ) {
+    val bitmap = remember(appInfo.packageName) { appInfo.icon?.toImageBitmap() }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -192,38 +203,33 @@ fun AppLockRow(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(CircleShape)
-                    .background(
-                        if (isLocked) BluePrimary.copy(alpha = 0.15f)
-                        else MaterialTheme.colorScheme.surfaceVariant,
-                    ),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    imageVector = if (isLocked) Icons.Default.Lock else Icons.Outlined.Lock,
-                    contentDescription = "App Lock Icon",
-                    tint = if (isLocked) BluePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(22.dp),
-                )
+                if (bitmap != null) {
+                    Image(
+                        bitmap = bitmap,
+                        contentDescription = appInfo.appName,
+                        modifier = Modifier.size(32.dp),
+                    )
+                } else {
+                    Icon(
+                        imageVector = if (isLocked) Icons.Default.Lock else Icons.Outlined.Lock,
+                        contentDescription = "App Icon",
+                        tint = if (isLocked) BluePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column {
-                Text(
-                    text = appInfo.appName,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-
-                Spacer(modifier = Modifier.height(2.dp))
-
-                Text(
-                    text = appInfo.category,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            Text(
+                text = appInfo.appName,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
         }
 
         Switch(
