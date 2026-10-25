@@ -19,9 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,16 +31,11 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,58 +44,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
 /**
- * Data representation for installed applications.
- */
-data class AppInfoItem(
-    val packageName: String,
-    val appName: String,
-    val category: String,
-)
-
-/**
- * Sample installed applications list for display and testing.
- */
-val SampleAppList = listOf(
-    AppInfoItem("com.whatsapp", "WhatsApp", "Social & Messaging"),
-    AppInfoItem("com.google.android.youtube", "YouTube", "Entertainment"),
-    AppInfoItem("com.instagram.android", "Instagram", "Social Media"),
-    AppInfoItem("com.google.android.apps.photos", "Photos", "Gallery"),
-    AppInfoItem("com.facebook.katana", "Facebook", "Social Media"),
-    AppInfoItem("com.snapchat.android", "Snapchat", "Messaging"),
-    AppInfoItem("com.google.android.apps.messaging", "Messages", "Communication"),
-    AppInfoItem("com.android.chrome", "Chrome", "Browser"),
-    AppInfoItem("com.spotify.music", "Spotify", "Music"),
-    AppInfoItem("com.telegram.messenger", "Telegram", "Messaging"),
-)
-
-/**
- * App Lock and Hide Feature Screen.
+ * Hide App Screen listing installed apps with hide/disguise switches.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppLockHideScreen(
+fun HideApp(
     onBackClick: () -> Unit,
 ) {
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
     var searchQuery by remember { mutableStateOf("") }
 
-    // Map tracking locked state per package name
-    val lockedStateMap = remember {
-        mutableStateMapOf<String, Boolean>().apply {
-            put("com.whatsapp", value = true)
-            put("com.google.android.apps.photos", value = true)
-        }
-    }
-
-    // Map tracking hidden state per package name
     val hiddenStateMap = remember {
         mutableStateMapOf<String, Boolean>()
     }
@@ -123,7 +83,7 @@ fun AppLockHideScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "App Lock & Hide",
+                        text = "3. Hide App (${hiddenStateMap.values.count { it }})",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -149,48 +109,12 @@ fun AppLockHideScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            // Tab Header (App Lock vs App Hide)
-            TabRow(
-                selectedTabIndex = selectedTabIndex,
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = BluePrimary,
-                indicator = { tabPositions ->
-                    if (selectedTabIndex < tabPositions.size) {
-                        TabRowDefaults.SecondaryIndicator(
-                            Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                            color = BluePrimary,
-                        )
-                    }
-                },
-            ) {
-                Tab(
-                    selected = selectedTabIndex == 0,
-                    onClick = { selectedTabIndex = 0 },
-                    text = {
-                        Text(
-                            text = "Lock Apps (${lockedStateMap.values.count { it }})",
-                            fontWeight = if (selectedTabIndex == 0) FontWeight.Bold else FontWeight.Medium,
-                        )
-                    },
-                )
-                Tab(
-                    selected = selectedTabIndex == 1,
-                    onClick = { selectedTabIndex = 1 },
-                    text = {
-                        Text(
-                            text = "Hide Apps (${hiddenStateMap.values.count { it }})",
-                            fontWeight = if (selectedTabIndex == 1) FontWeight.Bold else FontWeight.Medium,
-                        )
-                    },
-                )
-            }
-
             // Search Bar
             Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { query -> searchQuery = query },
-                    placeholder = { Text("Search apps...") },
+                    placeholder = { Text("Search apps to hide...") },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -209,7 +133,7 @@ fun AppLockHideScreen(
                 )
             }
 
-            // App List Section
+            // Installed Apps List
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -219,18 +143,13 @@ fun AppLockHideScreen(
                     items = filteredApps,
                     key = { it.packageName },
                 ) { app ->
-                    val isLocked = lockedStateMap[app.packageName] ?: false
                     val isHidden = hiddenStateMap[app.packageName] ?: false
 
-                    AppItemCard(
+                    HideAppItemCard(
                         appInfo = app,
-                        isToggleChecked = if (selectedTabIndex == 0) isLocked else isHidden,
+                        isHidden = isHidden,
                     ) { checked ->
-                        if (selectedTabIndex == 0) {
-                            lockedStateMap[app.packageName] = checked
-                        } else {
-                            hiddenStateMap[app.packageName] = checked
-                        }
+                        hiddenStateMap[app.packageName] = checked
                     }
                 }
             }
@@ -239,12 +158,12 @@ fun AppLockHideScreen(
 }
 
 /**
- * Individual App Row Item Card.
+ * Individual Hide App Item Card.
  */
 @Composable
-fun AppItemCard(
+fun HideAppItemCard(
     appInfo: AppInfoItem,
-    isToggleChecked: Boolean,
+    isHidden: Boolean,
     onToggleChange: (Boolean) -> Unit,
 ) {
     Card(
@@ -262,7 +181,6 @@ fun AppItemCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            // App Avatar / Icon Placeholder
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f),
@@ -272,15 +190,15 @@ fun AppItemCard(
                         .size(48.dp)
                         .clip(CircleShape)
                         .background(
-                            if (isToggleChecked) BluePrimary.copy(alpha = 0.15f)
+                            if (isHidden) Color(0xFF8B5CF6).copy(alpha = 0.15f)
                             else MaterialTheme.colorScheme.surfaceVariant,
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        imageVector = if (isToggleChecked) Icons.Default.Lock else Icons.Outlined.Lock,
-                        contentDescription = "App Icon",
-                        tint = if (isToggleChecked) BluePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        painter = painterResource(id = R.drawable.ic_hide_app),
+                        contentDescription = "Hide App Icon",
+                        tint = if (isHidden) Color(0xFF8B5CF6) else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(24.dp),
                     )
                 }
@@ -298,20 +216,19 @@ fun AppItemCard(
                     Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
-                        text = appInfo.category,
+                        text = if (isHidden) "Hidden from Launcher" else appInfo.category,
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (isHidden) Color(0xFF8B5CF6) else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
 
-            // Lock / Hide Toggle Switch
             Switch(
-                checked = isToggleChecked,
+                checked = isHidden,
                 onCheckedChange = onToggleChange,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
-                    checkedTrackColor = BluePrimary,
+                    checkedTrackColor = Color(0xFF8B5CF6),
                     uncheckedThumbColor = Color.White,
                     uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
                 ),
@@ -322,8 +239,8 @@ fun AppItemCard(
 
 @Preview(showBackground = true)
 @Composable
-fun AppLockHideScreenPreview() {
+fun HideAppPreview() {
     SylvenSecureTheme {
-        AppLockHideScreen {}
+        HideApp {}
     }
 }

@@ -15,7 +15,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.sylvenos.tools.ui.applock.AppLockHideScreen
+import com.sylvenos.tools.ui.applock.AppLock
+import com.sylvenos.tools.ui.applock.AppLockHideHome
+import com.sylvenos.tools.ui.applock.HideApp
+import com.sylvenos.tools.ui.applock.LockType
 import com.sylvenos.tools.ui.home.HomeScreen
 import com.sylvenos.tools.ui.permission.PermissionScreen
 import com.sylvenos.tools.ui.permission.hasAllRequiredPermissions
@@ -24,9 +27,12 @@ import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
 enum class AppDestination {
     SPLASH,
-    PERMISSION,
     HOME,
-    APP_LOCK_HIDE,
+    PERMISSION,
+    APP_LOCK_HIDE_HOME,
+    LOCK_TYPE,
+    APP_LOCK,
+    HIDE_APP,
 }
 
 class MainActivity : ComponentActivity() {
@@ -56,8 +62,15 @@ fun SylvenOSApp() {
         when (destination) {
             AppDestination.SPLASH -> {
                 SplashScreen {
+                    // Step 1: Launch -> Splash Screen -> Lands directly on Home Screen
+                    currentDestination = AppDestination.HOME
+                }
+            }
+            AppDestination.HOME -> {
+                HomeScreen {
+                    // Step 2: Clicking "App Lock and Hide" -> Check 3 required permissions
                     currentDestination = if (hasAllRequiredPermissions(context)) {
-                        AppDestination.HOME
+                        AppDestination.APP_LOCK_HIDE_HOME
                     } else {
                         AppDestination.PERMISSION
                     }
@@ -65,22 +78,40 @@ fun SylvenOSApp() {
             }
             AppDestination.PERMISSION -> {
                 PermissionScreen {
-                    currentDestination = AppDestination.HOME
+                    // Step 3: Once all 3 permissions allowed -> Enter AppLockHideHome
+                    currentDestination = AppDestination.APP_LOCK_HIDE_HOME
                 }
             }
-            AppDestination.HOME -> {
-                HomeScreen(
-                    onAppLockHideClick = {
-                        currentDestination = AppDestination.APP_LOCK_HIDE
-                    },
-                )
-            }
-            AppDestination.APP_LOCK_HIDE -> {
-                AppLockHideScreen(
+            AppDestination.APP_LOCK_HIDE_HOME -> {
+                // Step 4: AppLockHideHome showing 3 options: 1. Lock Type, 2. App Lock, 3. Hide App
+                AppLockHideHome(
                     onBackClick = {
                         currentDestination = AppDestination.HOME
                     },
-                )
+                    onLockTypeClick = {
+                        currentDestination = AppDestination.LOCK_TYPE
+                    },
+                    onAppLockClick = {
+                        currentDestination = AppDestination.APP_LOCK
+                    },
+                ) {
+                    currentDestination = AppDestination.HIDE_APP
+                }
+            }
+            AppDestination.LOCK_TYPE -> {
+                LockType {
+                    currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                }
+            }
+            AppDestination.APP_LOCK -> {
+                AppLock {
+                    currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                }
+            }
+            AppDestination.HIDE_APP -> {
+                HideApp {
+                    currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                }
             }
         }
     }
