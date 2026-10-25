@@ -4,11 +4,19 @@ plugins {
 }
 
 android {
+<<<<<<< HEAD
+    namespace = "com.sylvenos.tools"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.sylvenos.tools"
+=======
     namespace = "com.sylvenos.secure"
     compileSdk = 35
 
     defaultConfig {
         applicationId = "com.sylvenos.secure"
+>>>>>>> 7d350d2 (feat: add system-aware light and dark theme with smooth transitions)
         minSdk = 25
         targetSdk = 35
         versionCode = 1

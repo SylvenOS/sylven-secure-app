@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Native Splash Screen Colors (Dark Mode) -->
+    <color name="splash_background">#0F172A</color>
+    <color name="splash_primary">#258CF4</color>
+    <color name="splash_circle_bg">#1E293B</color>
+    <color name="shield_light_fill">#334155</color>
+</resources>
