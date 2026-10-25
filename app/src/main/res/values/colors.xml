@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<<<<<<< HEAD
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Native Splash Screen Colors (Light Mode) -->
+    <color name="splash_background">#F8FAFC</color>
+    <color name="splash_primary">#258CF4</color>
+    <color name="splash_circle_bg">#E2E8F0</color>
+    <color name="shield_light_fill">#F1F5F9</color>
+</resources>
+=======
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -10,3 +21,4 @@
     <color name="splash_background">#0F172A</color>
     <color name="splash_primary">#38BDF8</color>
 </resources>
+>>>>>>> 7d350d2 (feat: add system-aware light and dark theme with smooth transitions)

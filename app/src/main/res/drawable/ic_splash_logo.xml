@@ -1,4 +1,35 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+<<<<<<< HEAD
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Outer Shield Border/Base -->
+    <path
+        android:pathData="M100,16 L172,48 V104 C172,148 138,178 100,192 C62,178 28,148 28,104 V48 Z"
+        android:fillColor="#258CF4" />
+
+    <!-- Top-Left Quadrant (Light Fill) -->
+    <path
+        android:pathData="M100,28 L40,55 V100 H100 Z"
+        android:fillColor="@color/shield_light_fill" />
+
+    <!-- Top-Right Quadrant (Blue Fill) -->
+    <path
+        android:pathData="M100,28 L160,55 V100 H100 Z"
+        android:fillColor="#258CF4" />
+
+    <!-- Bottom-Left Quadrant (Blue Fill) -->
+    <path
+        android:pathData="M40,100 V104 C40,140 68,166 100,178 V100 Z"
+        android:fillColor="#258CF4" />
+
+    <!-- Bottom-Right Quadrant (Light Fill) -->
+    <path
+        android:pathData="M160,100 V104 C160,140 132,166 100,178 V100 Z"
+        android:fillColor="@color/shield_light_fill" />
+=======
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="288dp"
     android:height="288dp"
@@ -34,5 +65,6 @@
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:fillColor="#00000000" />
+>>>>>>> 7d350d2 (feat: add system-aware light and dark theme with smooth transitions)
 
 </vector>
