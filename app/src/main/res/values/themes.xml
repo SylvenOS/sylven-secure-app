@@ -6,11 +6,7 @@
     <!-- Splash Screen Theme -->
     <style name="Theme.SylvenSecure.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
-<<<<<<< HEAD
         <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>
-=======
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
->>>>>>> 7d350d2 (feat: add system-aware light and dark theme with smooth transitions)
         <item name="postSplashScreenTheme">@style/Theme.SylvenSecure</item>
     </style>
 

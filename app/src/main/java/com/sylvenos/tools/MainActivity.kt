@@ -24,7 +24,7 @@ import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 enum class AppDestination {
     SPLASH,
     PERMISSION,
-    HOME
+    HOME,
 }
 
 class MainActivity : ComponentActivity() {
@@ -43,32 +43,28 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SylvenOSApp() {
     val context = LocalContext.current
-    var currentDestination by remember { mutableStateOf(AppDestination.SPLASH) }
+    var currentDestination by remember { mutableStateOf(value = AppDestination.SPLASH) }
 
     Crossfade(
         targetState = currentDestination,
         animationSpec = tween(durationMillis = 500),
         modifier = Modifier.fillMaxSize(),
-        label = "AppScreenTransition"
+        label = "AppScreenTransition",
     ) { destination ->
         when (destination) {
             AppDestination.SPLASH -> {
-                SplashScreen(
-                    onSplashFinished = {
-                        if (hasAllRequiredPermissions(context)) {
-                            currentDestination = AppDestination.HOME
-                        } else {
-                            currentDestination = AppDestination.PERMISSION
-                        }
+                SplashScreen {
+                    currentDestination = if (hasAllRequiredPermissions(context)) {
+                        AppDestination.HOME
+                    } else {
+                        AppDestination.PERMISSION
                     }
-                )
+                }
             }
             AppDestination.PERMISSION -> {
-                PermissionScreen(
-                    onAllPermissionsGranted = {
-                        currentDestination = AppDestination.HOME
-                    }
-                )
+                PermissionScreen {
+                    currentDestination = AppDestination.HOME
+                }
             }
             AppDestination.HOME -> {
                 HomeScreen()
