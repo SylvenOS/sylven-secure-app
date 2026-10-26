@@ -2,6 +2,7 @@ package com.sylvenos.tools
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.Crossfade
@@ -11,10 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -54,7 +53,31 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SylvenOSApp() {
     val context = LocalContext.current
-    var currentDestination by remember { mutableStateOf(value = AppDestination.SPLASH) }
+
+    // Navigation backstack array list starting with SPLASH
+    val backStack = remember { mutableStateListOf(AppDestination.SPLASH) }
+    val currentDestination = backStack.lastOrNull() ?: AppDestination.HOME
+
+    // Push new destination to navigation stack
+    fun navigateTo(destination: AppDestination) {
+        if (backStack.lastOrNull() != destination) {
+            backStack.add(destination)
+        }
+    }
+
+    // Pop top destination from navigation stack
+    fun navigateBack(): Boolean {
+        if (backStack.size > 1) {
+            backStack.removeAt(backStack.lastIndex)
+            return true
+        }
+        return false
+    }
+
+    // Intercept Android System Softkey Back Button & Side Swipe Gesture
+    BackHandler(enabled = (backStack.size > 1) && (currentDestination != AppDestination.SPLASH)) {
+        navigateBack()
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -72,55 +95,47 @@ fun SylvenOSApp() {
             when (destination) {
                 AppDestination.SPLASH -> {
                     SplashScreen {
-                        // Launch -> Splash Screen -> Lands on Home Screen
-                        currentDestination = AppDestination.HOME
+                        // Splash finishes -> Clear stack and set HOME as root
+                        backStack.clear()
+                        backStack.add(AppDestination.HOME)
                     }
                 }
                 AppDestination.HOME -> {
                     HomeScreen {
                         // Clicking "App Lock and Hide" -> Check 3 required permissions
-                        currentDestination = if (hasAllRequiredPermissions(context)) {
-                            AppDestination.APP_LOCK_HIDE_HOME
+                        if (hasAllRequiredPermissions(context)) {
+                            navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
                         } else {
-                            AppDestination.PERMISSION
+                            navigateTo(AppDestination.PERMISSION)
                         }
                     }
                 }
                 AppDestination.PERMISSION -> {
                     PermissionScreen {
-                        // Once all 3 permissions allowed -> Enter AppLockHideHome
-                        currentDestination = AppDestination.APP_LOCK_HIDE_HOME
+                        // Once all 3 permissions allowed -> Replace PERMISSION with APP_LOCK_HIDE_HOME
+                        if (backStack.isNotEmpty()) {
+                            backStack.removeAt(backStack.lastIndex)
+                        }
+                        navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
                     }
                 }
                 AppDestination.APP_LOCK_HIDE_HOME -> {
                     AppLockHideHome(
-                        onBackClick = {
-                            currentDestination = AppDestination.HOME
-                        },
-                        onLockTypeClick = {
-                            currentDestination = AppDestination.LOCK_TYPE
-                        },
-                        onAppLockClick = {
-                            currentDestination = AppDestination.APP_LOCK
-                        },
+                        onBackClick = { navigateBack() },
+                        onLockTypeClick = { navigateTo(AppDestination.LOCK_TYPE) },
+                        onAppLockClick = { navigateTo(AppDestination.APP_LOCK) },
                     ) {
-                        currentDestination = AppDestination.HIDE_APP
+                        navigateTo(AppDestination.HIDE_APP)
                     }
                 }
                 AppDestination.LOCK_TYPE -> {
-                    LockType {
-                        currentDestination = AppDestination.APP_LOCK_HIDE_HOME
-                    }
+                    LockType { navigateBack() }
                 }
                 AppDestination.APP_LOCK -> {
-                    AppLock {
-                        currentDestination = AppDestination.APP_LOCK_HIDE_HOME
-                    }
+                    AppLock { navigateBack() }
                 }
                 AppDestination.HIDE_APP -> {
-                    HideApp {
-                        currentDestination = AppDestination.APP_LOCK_HIDE_HOME
-                    }
+                    HideApp { navigateBack() }
                 }
             }
         }
