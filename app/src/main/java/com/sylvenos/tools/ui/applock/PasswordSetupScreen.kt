@@ -2,7 +2,10 @@ package com.sylvenos.tools.ui.applock
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+<<<<<<< HEAD
+=======
 import androidx.compose.foundation.layout.Arrangement
+>>>>>>> origin/main
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,7 +54,29 @@ import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
+<<<<<<< HEAD
+// Helper function to validate 8-12 length, letters, numbers, and special characters
+private fun validatePasswordInput(password: String): String? {
+    if (password.length < 8) {
+        return "Password must be at least 8 characters long."
+    }
+    if (password.length > 12) {
+        return "Password cannot exceed 12 characters."
+    }
+    val hasLetter = password.any { it.isLetter() }
+    val hasDigit = password.any { it.isDigit() }
+    val hasSpecial = password.any { !it.isLetterOrDigit() }
+
+    if (!hasLetter || !hasDigit || !hasSpecial) {
+        return "Password must include letters, numbers, and special characters."
+    }
+    return null
+}
+
+// 2-Step Password Lock Creation & Verification Screen with transparent input field container
+=======
 // 2-Step Password Lock Creation & Verification Screen
+>>>>>>> origin/main
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordSetupScreen(
@@ -70,8 +95,14 @@ fun PasswordSetupScreen(
     // Handle step submission
     fun onSubmit() {
         errorMessage = ""
+<<<<<<< HEAD
+        val error = validatePasswordInput(currentInputPassword)
+        if (error != null) {
+            errorMessage = error
+=======
         if (currentInputPassword.length < 4) {
             errorMessage = "Password must be at least 4 characters long."
+>>>>>>> origin/main
             return
         }
 
@@ -84,7 +115,11 @@ fun PasswordSetupScreen(
                 LockSecurityManager.savePassword(context, confirmStepPassword)
                 onPasswordCreated()
             } else {
+<<<<<<< HEAD
+                // Password mismatch -> Show error and reset to Step 1
+=======
                 // Password mismatch -> Show error and reset
+>>>>>>> origin/main
                 errorMessage = "Passwords do not match. Try again."
                 firstStepPassword = ""
                 confirmStepPassword = ""
@@ -137,6 +172,40 @@ fun PasswordSetupScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+<<<<<<< HEAD
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_splash_logo),
+                contentDescription = "Shield Logo",
+                modifier = Modifier.size(90.dp),
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = if (isConfirmStep) "Confirm Password" else "Set Password",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = if (isConfirmStep) "Re-enter your password to confirm" else "8-12 characters, including letters, numbers & symbols",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Password Input Field with Transparent Container Background
+            OutlinedTextField(
+                value = currentInputPassword,
+                onValueChange = { input ->
+                    if (input.length <= 12) {
+=======
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             // Top Section (Logo, Title, TextField)
@@ -176,12 +245,64 @@ fun PasswordSetupScreen(
                 OutlinedTextField(
                     value = currentInputPassword,
                     onValueChange = { input ->
+>>>>>>> origin/main
                         errorMessage = ""
                         if (isConfirmStep) {
                             confirmStepPassword = input
                         } else {
                             firstStepPassword = input
                         }
+<<<<<<< HEAD
+                    } else {
+                        errorMessage = "Password cannot exceed 12 characters."
+                    }
+                },
+                label = {
+                    Text(if (isConfirmStep) "Confirm Password" else "Enter Password")
+                },
+                singleLine = true,
+                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    Text(
+                        text = if (isPasswordVisible) "Hide" else "Show",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = BluePrimary,
+                        modifier = Modifier
+                            .clickable { isPasswordVisible = !isPasswordVisible }
+                            .padding(horizontal = 12.dp),
+                    )
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { onSubmit() }),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(18.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = BluePrimary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                ),
+            )
+
+            if (errorMessage.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(14.dp))
+                Text(
+                    text = errorMessage,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Action Button placed directly under the input box
+            Button(
+                onClick = { onSubmit() },
+                enabled = currentInputPassword.length >= 8,
+=======
                     },
                     label = {
                         Text(if (isConfirmStep) "Confirm Password" else "Enter Password")
@@ -229,6 +350,7 @@ fun PasswordSetupScreen(
             Button(
                 onClick = { onSubmit() },
                 enabled = currentInputPassword.length >= 4,
+>>>>>>> origin/main
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

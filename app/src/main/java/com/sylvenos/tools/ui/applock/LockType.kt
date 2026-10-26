@@ -1,5 +1,9 @@
 package com.sylvenos.tools.ui.applock
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,115 +54,160 @@ enum class LockTypeOption {
     PASSWORD,
 }
 
-// App Lock Type Screen matching the screenshot UI with auto-theme styling
+enum class LockSetupMode {
+    MENU,
+    PIN_SETUP,
+    PATTERN_SETUP,
+    PASSWORD_SETUP,
+}
+
+// LockType Feature Container managing lock type selection and configuration setups (PIN, Pattern, Password)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LockType(
     onBackClick: () -> Unit,
-    onLockTypeSelected: (LockTypeOption) -> Unit = {},
 ) {
     val context = LocalContext.current
+    var activeMode by remember { mutableStateOf(LockSetupMode.MENU) }
     var selectedOption by remember { mutableStateOf(LockSecurityManager.getLockType(context)) }
     var isFaceEnabled by remember { mutableStateOf(value = false) }
     var isFingerprintEnabled by remember { mutableStateOf(value = false) }
 
-    fun selectType(type: LockTypeOption) {
-        selectedOption = type
-        LockSecurityManager.setLockType(context, type)
-        onLockTypeSelected(type)
+    // Intercept system back button / side swipe gesture when inside a sub setup screen
+    BackHandler(enabled = (activeMode != LockSetupMode.MENU)) {
+        activeMode = LockSetupMode.MENU
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "App lock type",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+    Crossfade(
+        targetState = activeMode,
+        animationSpec = tween(
+            durationMillis = 250,
+            easing = FastOutSlowInEasing,
+        ),
+        label = "LockTypeCrossfade",
+    ) { mode ->
+        when (mode) {
+            LockSetupMode.MENU -> {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "App lock type",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = onBackClick) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Back",
+                                    )
+                                }
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                            ),
                         )
+                    },
+                    containerColor = MaterialTheme.colorScheme.background,
+                ) { innerPadding ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 20.dp, vertical = 20.dp),
+                    ) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(24.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                // Pattern
+                                LockTypeRow(
+                                    title = "Pattern",
+                                    subtitle = "Medium security",
+                                    isSelected = selectedOption == LockTypeOption.PATTERN,
+                                ) {
+                                    selectedOption = LockTypeOption.PATTERN
+                                    LockSecurityManager.setLockType(context, LockTypeOption.PATTERN)
+                                    activeMode = LockSetupMode.PATTERN_SETUP
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+
+                                // PIN
+                                LockTypeRow(
+                                    title = "PIN",
+                                    subtitle = "Medium to high security",
+                                    isSelected = selectedOption == LockTypeOption.PIN,
+                                ) {
+                                    selectedOption = LockTypeOption.PIN
+                                    LockSecurityManager.setLockType(context, LockTypeOption.PIN)
+                                    activeMode = LockSetupMode.PIN_SETUP
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+
+                                // Password
+                                LockTypeRow(
+                                    title = "Password",
+                                    subtitle = "High security",
+                                    isSelected = selectedOption == LockTypeOption.PASSWORD,
+                                ) {
+                                    selectedOption = LockTypeOption.PASSWORD
+                                    LockSecurityManager.setLockType(context, LockTypeOption.PASSWORD)
+                                    activeMode = LockSetupMode.PASSWORD_SETUP
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+
+                                // Face Biometric Toggle Row
+                                LockTypeSwitchRow(
+                                    title = "Face",
+                                    isChecked = isFaceEnabled,
+                                ) { isFaceEnabled = it }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+
+                                // Fingerprints Biometric Toggle Row
+                                LockTypeSwitchRow(
+                                    title = "Fingerprints",
+                                    isChecked = isFingerprintEnabled,
+                                ) { isFingerprintEnabled = it }
+                            }
+                        }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 20.dp),
-        ) {
-            // Grouped Options Card Surface
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
+                }
+            }
+            LockSetupMode.PIN_SETUP -> {
+                PinSetupScreen(
+                    onBackClick = { activeMode = LockSetupMode.MENU },
                 ) {
-                    // Pattern
-                    LockTypeRow(
-                        title = "Pattern",
-                        subtitle = "Medium security",
-                        isSelected = selectedOption == LockTypeOption.PATTERN,
-                    ) {
-                        selectType(LockTypeOption.PATTERN)
-                    }
-
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
-
-                    // PIN
-                    LockTypeRow(
-                        title = "PIN",
-                        subtitle = "Medium to high security",
-                        isSelected = selectedOption == LockTypeOption.PIN,
-                    ) {
-                        selectType(LockTypeOption.PIN)
-                    }
-
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
-
-                    // Password
-                    LockTypeRow(
-                        title = "Password",
-                        subtitle = "High security",
-                        isSelected = selectedOption == LockTypeOption.PASSWORD,
-                    ) {
-                        selectType(LockTypeOption.PASSWORD)
-                    }
-
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
-
-                    // Face Biometric Toggle Row
-                    LockTypeSwitchRow(
-                        title = "Face",
-                        isChecked = isFaceEnabled,
-                    ) { isFaceEnabled = it }
-
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
-
-                    // Fingerprints Biometric Toggle Row
-                    LockTypeSwitchRow(
-                        title = "Fingerprints",
-                        isChecked = isFingerprintEnabled,
-                    ) { isFingerprintEnabled = it }
+                    activeMode = LockSetupMode.MENU
+                }
+            }
+            LockSetupMode.PATTERN_SETUP -> {
+                PatternSetupScreen(
+                    onBackClick = { activeMode = LockSetupMode.MENU },
+                ) {
+                    activeMode = LockSetupMode.MENU
+                }
+            }
+            LockSetupMode.PASSWORD_SETUP -> {
+                PasswordSetupScreen(
+                    onBackClick = { activeMode = LockSetupMode.MENU },
+                ) {
+                    activeMode = LockSetupMode.MENU
                 }
             }
         }
@@ -240,6 +289,6 @@ fun LockTypeSwitchRow(
 @Composable
 fun LockTypePreview() {
     SylvenSecureTheme {
-        LockType(onBackClick = {})
+        LockType {}
     }
 }
