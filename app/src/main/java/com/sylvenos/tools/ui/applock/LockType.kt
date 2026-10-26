@@ -135,7 +135,7 @@ fun LockType(
                                 // Pattern
                                 LockTypeRow(
                                     title = "Pattern",
-                                    subtitle = "Medium security",
+                                    subtitle = if (selectedOption == LockTypeOption.PATTERN) "Active - Medium security" else "Medium security",
                                     isSelected = selectedOption == LockTypeOption.PATTERN,
                                 ) {
                                     selectedOption = LockTypeOption.PATTERN
@@ -148,7 +148,7 @@ fun LockType(
                                 // PIN
                                 LockTypeRow(
                                     title = "PIN",
-                                    subtitle = "Medium to high security",
+                                    subtitle = if (selectedOption == LockTypeOption.PIN) "Active - Medium to high security" else "Medium to high security",
                                     isSelected = selectedOption == LockTypeOption.PIN,
                                 ) {
                                     selectedOption = LockTypeOption.PIN
@@ -161,7 +161,7 @@ fun LockType(
                                 // Password
                                 LockTypeRow(
                                     title = "Password",
-                                    subtitle = "High security",
+                                    subtitle = if (selectedOption == LockTypeOption.PASSWORD) "Active - High security" else "High security",
                                     isSelected = selectedOption == LockTypeOption.PASSWORD,
                                 ) {
                                     selectedOption = LockTypeOption.PASSWORD
@@ -246,7 +246,7 @@ fun LockTypeRow(
             text = subtitle,
             fontSize = 13.sp,
             fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (isSelected) BluePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
