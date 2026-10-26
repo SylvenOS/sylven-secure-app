@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.sylvenos.tools.ui.applock.AppLockHideHome
+import com.sylvenos.tools.ui.applock.AppLockService
 import com.sylvenos.tools.ui.applock.LockSecurityManager
 import com.sylvenos.tools.ui.applock.LockVerificationScreen
 import com.sylvenos.tools.ui.applock.PinSetupScreen
@@ -85,6 +87,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SylvenOSApp() {
     val context = LocalContext.current
+
+    // Ensure background service is running when locked packages exist
+    LaunchedEffect(Unit) {
+        if (hasAllRequiredPermissions(context) && LockSecurityManager.getLockedPackages(context).isNotEmpty()) {
+            AppLockService.startService(context)
+        }
+    }
 
     // Root Navigation Stack tracking main app flow
     val backStack = remember { mutableStateListOf(MainAppDestination.SPLASH) }

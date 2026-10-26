@@ -63,16 +63,19 @@ fun AppLock(
     val context = LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
     val realApps = remember { mutableStateListOf<InstalledAppItem>() }
+    val lockedStateMap = remember { mutableStateMapOf<String, Boolean>() }
 
-    // Fetch real installed apps on startup
+    // Fetch real installed apps and initialize locked package states on startup
     LaunchedEffect(Unit) {
         val apps = getInstalledApps(context)
         realApps.clear()
         realApps.addAll(apps)
-    }
 
-    val lockedStateMap = remember {
-        mutableStateMapOf<String, Boolean>()
+        val lockedSet = LockSecurityManager.getLockedPackages(context)
+        lockedStateMap.clear()
+        for (pkg in lockedSet) {
+            lockedStateMap[pkg] = true
+        }
     }
 
     val filteredApps = remember(searchQuery, realApps.size) {
@@ -159,6 +162,11 @@ fun AppLock(
                         isLocked = isLocked,
                     ) { checked ->
                         lockedStateMap[app.packageName] = checked
+                        if (checked) {
+                            LockSecurityManager.addLockedPackage(context, app.packageName)
+                        } else {
+                            LockSecurityManager.removeLockedPackage(context, app.packageName)
+                        }
                     }
 
                     if (index < filteredApps.lastIndex) {
