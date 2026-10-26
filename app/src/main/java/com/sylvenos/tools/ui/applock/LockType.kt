@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,10 +55,18 @@ enum class LockTypeOption {
 @Composable
 fun LockType(
     onBackClick: () -> Unit,
+    onLockTypeSelected: (LockTypeOption) -> Unit = {},
 ) {
-    var selectedOption by remember { mutableStateOf(value = LockTypeOption.PASSWORD) }
+    val context = LocalContext.current
+    var selectedOption by remember { mutableStateOf(LockSecurityManager.getLockType(context)) }
     var isFaceEnabled by remember { mutableStateOf(value = false) }
     var isFingerprintEnabled by remember { mutableStateOf(value = false) }
+
+    fun selectType(type: LockTypeOption) {
+        selectedOption = type
+        LockSecurityManager.setLockType(context, type)
+        onLockTypeSelected(type)
+    }
 
     Scaffold(
         topBar = {
@@ -110,7 +119,7 @@ fun LockType(
                         subtitle = "Medium security",
                         isSelected = selectedOption == LockTypeOption.PATTERN,
                     ) {
-                        selectedOption = LockTypeOption.PATTERN
+                        selectType(LockTypeOption.PATTERN)
                     }
 
                     HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
@@ -121,7 +130,7 @@ fun LockType(
                         subtitle = "Medium to high security",
                         isSelected = selectedOption == LockTypeOption.PIN,
                     ) {
-                        selectedOption = LockTypeOption.PIN
+                        selectType(LockTypeOption.PIN)
                     }
 
                     HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
@@ -132,7 +141,7 @@ fun LockType(
                         subtitle = "High security",
                         isSelected = selectedOption == LockTypeOption.PASSWORD,
                     ) {
-                        selectedOption = LockTypeOption.PASSWORD
+                        selectType(LockTypeOption.PASSWORD)
                     }
 
                     HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
@@ -231,6 +240,6 @@ fun LockTypeSwitchRow(
 @Composable
 fun LockTypePreview() {
     SylvenSecureTheme {
-        LockType {}
+        LockType(onBackClick = {})
     }
 }
