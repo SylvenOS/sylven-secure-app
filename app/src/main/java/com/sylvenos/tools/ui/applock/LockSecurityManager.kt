@@ -4,34 +4,96 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
-// Secure Manager for saving and retrieving PIN lock settings
+// Standardized Security Manager for saving and verifying all lock types (PIN, Pattern, Password)
 object LockSecurityManager {
     private const val PREF_NAME = "sylven_security_prefs"
+    private const val KEY_LOCK_TYPE = "key_active_lock_type"
     private const val KEY_PIN = "key_app_lock_pin"
+    private const val KEY_PATTERN = "key_app_lock_pattern"
+    private const val KEY_PASSWORD = "key_app_lock_password"
 
     private fun getPreferences(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     }
 
-    // Check if 4-digit PIN is set
+    // Get active lock mode (PIN, PATTERN, PASSWORD)
+    fun getLockType(context: Context): LockTypeOption {
+        val typeStr = getPreferences(context).getString(KEY_LOCK_TYPE, LockTypeOption.PIN.name)
+        return try {
+            LockTypeOption.valueOf(typeStr ?: LockTypeOption.PIN.name)
+        } catch (_: Exception) {
+            LockTypeOption.PIN
+        }
+    }
+
+    // Set active lock mode
+    fun setLockType(context: Context, lockType: LockTypeOption) {
+        getPreferences(context).edit {
+            putString(KEY_LOCK_TYPE, lockType.name)
+        }
+    }
+
+    // Check if any security lock (PIN, Pattern, or Password) is configured
+    fun isLockSet(context: Context): Boolean {
+        return when (getLockType(context)) {
+            LockTypeOption.PIN -> isPinSet(context)
+            LockTypeOption.PATTERN -> isPatternSet(context)
+            LockTypeOption.PASSWORD -> isPasswordSet(context)
+        }
+    }
+
+    // PIN Methods
     fun isPinSet(context: Context): Boolean {
         return getPreferences(context).getString(KEY_PIN, null)?.isNotBlank() == true
     }
 
-    // Save 4-digit PIN
     fun savePin(context: Context, pin: String) {
+        setLockType(context, LockTypeOption.PIN)
         getPreferences(context).edit {
             putString(KEY_PIN, pin)
         }
     }
 
-    // Retrieve saved PIN
     fun getPin(context: Context): String? {
         return getPreferences(context).getString(KEY_PIN, null)
     }
 
-    // Verify if entered PIN matches saved PIN
-    fun verifyPin(context: Context, enteredPin: String): Boolean {
-        return getPin(context) == enteredPin
+    // Pattern Methods
+    fun isPatternSet(context: Context): Boolean {
+        return getPreferences(context).getString(KEY_PATTERN, null)?.isNotBlank() == true
+    }
+
+    fun savePattern(context: Context, patternNodes: List<Int>) {
+        setLockType(context, LockTypeOption.PATTERN)
+        val patternString = patternNodes.joinToString(separator = ",")
+        getPreferences(context).edit {
+            putString(KEY_PATTERN, patternString)
+        }
+    }
+
+    fun getPattern(context: Context): List<Int> {
+        val patternString = getPreferences(context).getString(KEY_PATTERN, "") ?: ""
+        if (patternString.isBlank()) return emptyList()
+        return try {
+            patternString.split(",").map { it.toInt() }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    // Password Methods
+    fun isPasswordSet(context: Context): Boolean {
+        return getPreferences(context).getString(KEY_PASSWORD, null)?.isNotBlank() == true
+    }
+
+    fun savePassword(context: Context, password: String) {
+        setLockType(context, LockTypeOption.PASSWORD)
+        getPreferences(context).edit {
+            putString(KEY_PASSWORD, password)
+        }
+    }
+
+    fun getPassword(context: Context): String? {
+        return getPreferences(context).getString(KEY_PASSWORD, null)
     }
 }
