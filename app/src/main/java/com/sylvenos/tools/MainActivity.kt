@@ -8,7 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,13 +52,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.sylvenos.tools.ui.applock.AppLockHideHome
 import com.sylvenos.tools.ui.applock.LockSecurityManager
-<<<<<<< HEAD
-=======
-import com.sylvenos.tools.ui.applock.LockType
-import com.sylvenos.tools.ui.applock.LockTypeOption
-import com.sylvenos.tools.ui.applock.PasswordSetupScreen
-import com.sylvenos.tools.ui.applock.PatternSetupScreen
->>>>>>> origin/main
 import com.sylvenos.tools.ui.applock.PinSetupScreen
 import com.sylvenos.tools.ui.permission.PermissionScreen
 import com.sylvenos.tools.ui.permission.hasAllRequiredPermissions
@@ -71,13 +63,7 @@ enum class MainAppDestination {
     SPLASH,
     HOME,
     PERMISSION,
-<<<<<<< HEAD
     FIRST_TIME_PIN_SETUP,
-=======
-    PIN_SETUP,
-    PATTERN_SETUP,
-    PASSWORD_SETUP,
->>>>>>> origin/main
     APP_LOCK_HIDE_HOME,
 }
 
@@ -150,15 +136,7 @@ fun SylvenOSApp() {
                         if (!hasAllRequiredPermissions(context)) {
                             navigateTo(MainAppDestination.PERMISSION)
                         } else if (!LockSecurityManager.isLockSet(context)) {
-<<<<<<< HEAD
                             navigateTo(MainAppDestination.FIRST_TIME_PIN_SETUP)
-=======
-                            when (LockSecurityManager.getLockType(context)) {
-                                LockTypeOption.PATTERN -> navigateTo(AppDestination.PATTERN_SETUP)
-                                LockTypeOption.PASSWORD -> navigateTo(AppDestination.PASSWORD_SETUP)
-                                else -> navigateTo(AppDestination.PIN_SETUP)
-                            }
->>>>>>> origin/main
                         } else {
                             navigateTo(MainAppDestination.APP_LOCK_HIDE_HOME)
                         }
@@ -171,15 +149,7 @@ fun SylvenOSApp() {
                             backStack.removeAt(backStack.lastIndex)
                         }
                         if (!LockSecurityManager.isLockSet(context)) {
-<<<<<<< HEAD
                             navigateTo(MainAppDestination.FIRST_TIME_PIN_SETUP)
-=======
-                            when (LockSecurityManager.getLockType(context)) {
-                                LockTypeOption.PATTERN -> navigateTo(AppDestination.PATTERN_SETUP)
-                                LockTypeOption.PASSWORD -> navigateTo(AppDestination.PASSWORD_SETUP)
-                                else -> navigateTo(AppDestination.PIN_SETUP)
-                            }
->>>>>>> origin/main
                         } else {
                             navigateTo(MainAppDestination.APP_LOCK_HIDE_HOME)
                         }
@@ -195,62 +165,8 @@ fun SylvenOSApp() {
                         navigateTo(MainAppDestination.APP_LOCK_HIDE_HOME)
                     }
                 }
-<<<<<<< HEAD
                 MainAppDestination.APP_LOCK_HIDE_HOME -> {
                     AppLockHideHome { navigateBack() }
-=======
-                AppDestination.PATTERN_SETUP -> {
-                    PatternSetupScreen(
-                        onBackClick = { navigateBack() },
-                    ) {
-                        if (backStack.isNotEmpty()) {
-                            backStack.removeAt(backStack.lastIndex)
-                        }
-                        navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
-                    }
-                }
-                AppDestination.PASSWORD_SETUP -> {
-                    PasswordSetupScreen(
-                        onBackClick = { navigateBack() },
-                    ) {
-                        if (backStack.isNotEmpty()) {
-                            backStack.removeAt(backStack.lastIndex)
-                        }
-                        navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
-                    }
-                }
-                AppDestination.APP_LOCK_HIDE_HOME -> {
-                    AppLockHideHome(
-                        onBackClick = { navigateBack() },
-                        onLockTypeClick = { navigateTo(AppDestination.LOCK_TYPE) },
-                        onAppLockClick = { navigateTo(AppDestination.APP_LOCK) },
-                    ) {
-                        navigateTo(AppDestination.HIDE_APP)
-                    }
-                }
-                AppDestination.LOCK_TYPE -> {
-                    LockType(
-                        onBackClick = { navigateBack() },
-                    ) { lockOption ->
-                        when (lockOption) {
-                            LockTypeOption.PATTERN -> {
-                                navigateTo(AppDestination.PATTERN_SETUP)
-                            }
-                            LockTypeOption.PIN -> {
-                                navigateTo(AppDestination.PIN_SETUP)
-                            }
-                            LockTypeOption.PASSWORD -> {
-                                navigateTo(AppDestination.PASSWORD_SETUP)
-                            }
-                        }
-                    }
-                }
-                AppDestination.APP_LOCK -> {
-                    AppLock { navigateBack() }
-                }
-                AppDestination.HIDE_APP -> {
-                    HideApp { navigateBack() }
->>>>>>> origin/main
                 }
             }
         }
@@ -331,7 +247,7 @@ fun HomeScreen(
     }
 }
 
-// Feature Card Item with ImageVector
+// Feature Card Item with ImageVector and clipped rounded corners for touch feedback
 @Composable
 fun HomeFeatureCard(
     title: String,
@@ -341,9 +257,8 @@ fun HomeFeatureCard(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -412,7 +327,7 @@ fun HomeFeatureCard(
     }
 }
 
-// Feature Card Item with Painter
+// Feature Card Item with Painter and clipped rounded corners for touch feedback
 @Composable
 fun HomeFeatureCardWithPainter(
     title: String,
@@ -422,9 +337,8 @@ fun HomeFeatureCardWithPainter(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,

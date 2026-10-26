@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -124,10 +123,9 @@ fun AppLockHideHome(
                             description = "Change lock types",
                             icon = Icons.Outlined.Lock,
                             accentColor = BluePrimary,
-                            onClick = {
-                                subDestination = AppLockSubDestination.LOCK_TYPE
-                            },
-                        )
+                        ) {
+                            subDestination = AppLockSubDestination.LOCK_TYPE
+                        }
 
                         // Option 2: App Lock
                         OptionCard(
@@ -135,10 +133,9 @@ fun AppLockHideHome(
                             description = "Lock/Unlock Apps",
                             icon = Icons.Default.Lock,
                             accentColor = Color(0xFF10B981),
-                            onClick = {
-                                subDestination = AppLockSubDestination.APP_LOCK
-                            },
-                        )
+                        ) {
+                            subDestination = AppLockSubDestination.APP_LOCK
+                        }
 
                         // Option 3: Hide App
                         OptionCardWithPainter(
@@ -146,33 +143,32 @@ fun AppLockHideHome(
                             description = "Hide/Unhide Apps",
                             painter = painterResource(id = R.drawable.ic_hide_app),
                             accentColor = Color(0xFF8B5CF6),
-                            onClick = {
-                                subDestination = AppLockSubDestination.HIDE_APP
-                            },
-                        )
+                        ) {
+                            subDestination = AppLockSubDestination.HIDE_APP
+                        }
                     }
                 }
             }
             AppLockSubDestination.LOCK_TYPE -> {
-                LockType(
-                    onBackClick = { subDestination = AppLockSubDestination.MENU_HOME },
-                )
+                LockType {
+                    subDestination = AppLockSubDestination.MENU_HOME
+                }
             }
             AppLockSubDestination.APP_LOCK -> {
-                AppLock(
-                    onBackClick = { subDestination = AppLockSubDestination.MENU_HOME },
-                )
+                AppLock {
+                    subDestination = AppLockSubDestination.MENU_HOME
+                }
             }
             AppLockSubDestination.HIDE_APP -> {
-                HideApp(
-                    onBackClick = { subDestination = AppLockSubDestination.MENU_HOME },
-                )
+                HideApp {
+                    subDestination = AppLockSubDestination.MENU_HOME
+                }
             }
         }
     }
 }
 
-// Individual Option Card Item with ImageVector
+// Individual Option Card Item with ImageVector and clipped rounded corners for touch feedback
 @Composable
 fun OptionCard(
     title: String,
@@ -182,9 +178,8 @@ fun OptionCard(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -252,7 +247,7 @@ fun OptionCard(
     }
 }
 
-// Individual Option Card Item with Painter
+// Individual Option Card Item with Painter and clipped rounded corners for touch feedback
 @Composable
 fun OptionCardWithPainter(
     title: String,
@@ -262,9 +257,8 @@ fun OptionCardWithPainter(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -336,8 +330,6 @@ fun OptionCardWithPainter(
 @Composable
 fun AppLockHideHomePreview() {
     SylvenSecureTheme {
-        AppLockHideHome(
-            onBackClick = {},
-        )
+        AppLockHideHome {}
     }
 }

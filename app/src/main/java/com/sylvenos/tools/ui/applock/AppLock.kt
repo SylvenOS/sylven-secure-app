@@ -21,8 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -56,7 +54,7 @@ import androidx.compose.ui.unit.sp
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-// App Lock Screen showing real installed apps matching screenshot UI
+// App Lock Screen showing real installed apps directly matching snapshot UI
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLock(
@@ -134,48 +132,39 @@ fun AppLock(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .padding(bottom = 12.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = BluePrimary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedBorderColor = Color.Transparent,
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                 ),
             )
 
-            // Grouped Card Surface for Real Apps
-            Card(
+            // Direct List of Real Apps without forced outer card
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    itemsIndexed(
-                        items = filteredApps,
-                        key = { _, app -> app.packageName },
-                    ) { index, app ->
-                        val isLocked = lockedStateMap[app.packageName] ?: false
+                itemsIndexed(
+                    items = filteredApps,
+                    key = { _, app -> app.packageName },
+                ) { index, app ->
+                    val isLocked = lockedStateMap[app.packageName] ?: false
 
-                        AppLockRow(
-                            appInfo = app,
-                            isLocked = isLocked,
-                        ) { checked ->
-                            lockedStateMap[app.packageName] = checked
-                        }
+                    AppLockRow(
+                        appInfo = app,
+                        isLocked = isLocked,
+                    ) { checked ->
+                        lockedStateMap[app.packageName] = checked
+                    }
 
-                        if (index < filteredApps.lastIndex) {
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-                            )
-                        }
+                    if (index < filteredApps.lastIndex) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                        )
                     }
                 }
             }
@@ -183,7 +172,7 @@ fun AppLock(
     }
 }
 
-// Individual Real App Lock Row inside Grouped Card
+// Individual Real App Lock Row
 @Composable
 fun AppLockRow(
     appInfo: InstalledAppItem,
@@ -195,7 +184,7 @@ fun AppLockRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 14.dp),
+            .padding(horizontal = 8.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

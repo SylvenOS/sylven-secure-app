@@ -19,8 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,7 +53,7 @@ import androidx.compose.ui.unit.sp
 import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-// Hide App Screen matching screenshot UI and project auto-theme
+// Hide App Screen showing real installed apps directly matching snapshot UI
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HideApp(
@@ -133,48 +131,39 @@ fun HideApp(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .padding(bottom = 12.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF8B5CF6),
-                    unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedBorderColor = Color.Transparent,
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                 ),
             )
 
-            // Grouped Card Surface for Real Apps
-            Card(
+            // Direct List of Real Apps without forced outer card
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    itemsIndexed(
-                        items = filteredApps,
-                        key = { _, app -> app.packageName },
-                    ) { index, app ->
-                        val isHidden = hiddenStateMap[app.packageName] ?: false
+                itemsIndexed(
+                    items = filteredApps,
+                    key = { _, app -> app.packageName },
+                ) { index, app ->
+                    val isHidden = hiddenStateMap[app.packageName] ?: false
 
-                        HideAppRow(
-                            appInfo = app,
-                            isHidden = isHidden,
-                        ) { checked ->
-                            hiddenStateMap[app.packageName] = checked
-                        }
+                    HideAppRow(
+                        appInfo = app,
+                        isHidden = isHidden,
+                    ) { checked ->
+                        hiddenStateMap[app.packageName] = checked
+                    }
 
-                        if (index < filteredApps.lastIndex) {
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-                            )
-                        }
+                    if (index < filteredApps.lastIndex) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                        )
                     }
                 }
             }
@@ -182,7 +171,7 @@ fun HideApp(
     }
 }
 
-// Individual Real App Hide Row inside Grouped Card
+// Individual Real App Hide Row
 @Composable
 fun HideAppRow(
     appInfo: InstalledAppItem,
@@ -194,7 +183,7 @@ fun HideAppRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 14.dp),
+            .padding(horizontal = 8.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
