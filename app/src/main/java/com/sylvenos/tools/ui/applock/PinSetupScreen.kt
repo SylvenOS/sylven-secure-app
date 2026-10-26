@@ -210,7 +210,7 @@ fun PinSetupScreen(
                 }
             }
 
-            // Custom Keypad Grid
+            // Custom Keypad Grid with doubled 32dp vertical space above
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

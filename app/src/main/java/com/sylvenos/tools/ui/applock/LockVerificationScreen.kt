@@ -58,10 +58,11 @@ import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-// Lock Verification Screen verifying active lock (PIN, Pattern, Password) before entering AppLockHideHome
+// Lock Verification Screen verifying active lock (PIN, Pattern, Password)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LockVerificationScreen(
+    showTopBar: Boolean = true,
     onBackClick: () -> Unit,
     onUnlocked: () -> Unit,
 ) {
@@ -73,10 +74,22 @@ fun LockVerificationScreen(
     var isPasswordVisible by remember { mutableStateOf(value = false) }
     var errorMessage by remember { mutableStateOf("") }
     var patternResetTrigger by remember { mutableIntStateOf(0) }
+    var failedAttempts by remember { mutableIntStateOf(0) }
+
+    // Helper to handle incorrect attempts (Max 5 attempts allowed)
+    fun registerFailedAttempt() {
+        failedAttempts++
+        if (failedAttempts >= 5) {
+            errorMessage = "5 incorrect attempts. Access blocked."
+            onBackClick()
+        } else {
+            val remaining = 5 - failedAttempts
+            errorMessage = "Incorrect input ($remaining attempts left)."
+        }
+    }
 
     // PIN Keypad Handlers
     fun onPinKeyPress(digit: String) {
-        errorMessage = ""
         if (enteredPin.length < 4) {
             val newPin = enteredPin + digit
             enteredPin = newPin
@@ -84,15 +97,14 @@ fun LockVerificationScreen(
                 if (LockSecurityManager.getPin(context) == newPin) {
                     onUnlocked()
                 } else {
-                    errorMessage = "Incorrect PIN. Try again."
                     enteredPin = ""
+                    registerFailedAttempt()
                 }
             }
         }
     }
 
     fun onPinBackspace() {
-        errorMessage = ""
         if (enteredPin.isNotEmpty()) {
             enteredPin = enteredPin.dropLast(1)
         }
@@ -100,48 +112,48 @@ fun LockVerificationScreen(
 
     // Pattern Handler
     fun onPatternCompleted(pattern: List<Int>) {
-        errorMessage = ""
         if (LockSecurityManager.getPattern(context) == pattern) {
             onUnlocked()
         } else {
-            errorMessage = "Incorrect pattern. Try again."
             patternResetTrigger++
+            registerFailedAttempt()
         }
     }
 
     // Password Handler
     fun onPasswordSubmit() {
-        errorMessage = ""
         if (LockSecurityManager.getPassword(context) == enteredPassword) {
             onUnlocked()
         } else {
-            errorMessage = "Incorrect password. Try again."
+            registerFailedAttempt()
         }
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Enter Lock",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+            if (showTopBar) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Enter Lock",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
                         )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+                )
+            }
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
@@ -153,15 +165,16 @@ fun LockVerificationScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
         ) {
-            // Header
+            // Header Section
             Image(
                 painter = painterResource(id = R.drawable.ic_splash_logo),
                 contentDescription = "Shield Logo",
                 modifier = Modifier.size(80.dp),
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = when (activeLockType) {
@@ -174,7 +187,7 @@ fun LockVerificationScreen(
                 color = MaterialTheme.colorScheme.onBackground,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = "Verify your lock to access protected area",
@@ -184,7 +197,7 @@ fun LockVerificationScreen(
             )
 
             if (errorMessage.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = errorMessage,
                     fontSize = 13.sp,
@@ -194,16 +207,16 @@ fun LockVerificationScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(60.dp))
 
             // Lock Input Area based on Active Lock Type
             when (activeLockType) {
                 LockTypeOption.PIN -> {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        // 4 PIN Dot Indicators
+                        // 4 PIN Dot Indicators directly above keypad
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(18.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -222,6 +235,7 @@ fun LockVerificationScreen(
                             }
                         }
 
+                        // Doubled vertical space between input dots and numbers grid
                         Spacer(modifier = Modifier.height(32.dp))
 
                         // Keypad Grid
@@ -232,25 +246,30 @@ fun LockVerificationScreen(
                             listOf("", "0", "DEL"),
                         )
 
-                        for (row in keypadRows) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                for (key in row) {
-                                    when (key) {
-                                        "DEL" -> {
-                                            KeypadButton(digit = "⌫") {
-                                                onPinBackspace()
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            for (row in keypadRows) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    for (key in row) {
+                                        when (key) {
+                                            "DEL" -> {
+                                                KeypadButton(digit = "⌫") {
+                                                    onPinBackspace()
+                                                }
                                             }
-                                        }
-                                        "" -> {
-                                            Spacer(modifier = Modifier.size(68.dp))
-                                        }
-                                        else -> {
-                                            KeypadButton(digit = key) {
-                                                onPinKeyPress(key)
+                                            "" -> {
+                                                Spacer(modifier = Modifier.size(68.dp))
+                                            }
+                                            else -> {
+                                                KeypadButton(digit = key) {
+                                                    onPinKeyPress(key)
+                                                }
                                             }
                                         }
                                     }
