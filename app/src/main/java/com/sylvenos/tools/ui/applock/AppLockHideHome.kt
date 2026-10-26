@@ -1,5 +1,9 @@
 package com.sylvenos.tools.ui.applock
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +36,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,75 +54,120 @@ import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-// Main App Lock and Hide Home Screen
+enum class AppLockSubDestination {
+    MENU_HOME,
+    LOCK_TYPE,
+    APP_LOCK,
+    HIDE_APP,
+}
+
+// AppLockHideHome Feature Container managing sub-screens (LOCK_TYPE, APP_LOCK, HIDE_APP)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLockHideHome(
     onBackClick: () -> Unit,
-    onLockTypeClick: () -> Unit,
-    onAppLockClick: () -> Unit,
-    onHideAppClick: () -> Unit,
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "App Lock & Hide",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+    var subDestination by remember { mutableStateOf(AppLockSubDestination.MENU_HOME) }
+
+    // Intercept system back button / side swipe gesture when inside a sub-screen
+    BackHandler(enabled = (subDestination != AppLockSubDestination.MENU_HOME)) {
+        subDestination = AppLockSubDestination.MENU_HOME
+    }
+
+    Crossfade(
+        targetState = subDestination,
+        animationSpec = tween(
+            durationMillis = 250,
+            easing = FastOutSlowInEasing,
+        ),
+        label = "AppLockHideSubCrossfade",
+    ) { destination ->
+        when (destination) {
+            AppLockSubDestination.MENU_HOME -> {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = "App Lock & Hide",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = onBackClick) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Back",
+                                    )
+                                }
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                        )
+                    },
+                    containerColor = MaterialTheme.colorScheme.background,
+                ) { innerPadding ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 20.dp, vertical = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        // Option 1: Lock Type
+                        OptionCard(
+                            title = "Lock Type",
+                            description = "Change lock types",
+                            icon = Icons.Outlined.Lock,
+                            accentColor = BluePrimary,
+                            onClick = {
+                                subDestination = AppLockSubDestination.LOCK_TYPE
+                            },
+                        )
+
+                        // Option 2: App Lock
+                        OptionCard(
+                            title = "App Lock",
+                            description = "Lock/Unlock Apps",
+                            icon = Icons.Default.Lock,
+                            accentColor = Color(0xFF10B981),
+                            onClick = {
+                                subDestination = AppLockSubDestination.APP_LOCK
+                            },
+                        )
+
+                        // Option 3: Hide App
+                        OptionCardWithPainter(
+                            title = "Hide App",
+                            description = "Hide/Unhide Apps",
+                            painter = painterResource(id = R.drawable.ic_hide_app),
+                            accentColor = Color(0xFF8B5CF6),
+                            onClick = {
+                                subDestination = AppLockSubDestination.HIDE_APP
+                            },
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            // Option 1: Lock Type
-            OptionCard(
-                title = "Lock Type",
-                description = "Change lock types",
-                icon = Icons.Outlined.Lock,
-                accentColor = BluePrimary,
-                onClick = onLockTypeClick,
-            )
-
-            // Option 2: App Lock
-            OptionCard(
-                title = "App Lock",
-                description = "Lock/Unlock Apps",
-                icon = Icons.Default.Lock,
-                accentColor = Color(0xFF10B981),
-                onClick = onAppLockClick,
-            )
-
-            // Option 3: Hide App
-            OptionCardWithPainter(
-                title = "Hide App",
-                description = "Hide/Unhide Apps",
-                painter = painterResource(id = R.drawable.ic_hide_app),
-                accentColor = Color(0xFF8B5CF6),
-                onClick = onHideAppClick,
-            )
+                }
+            }
+            AppLockSubDestination.LOCK_TYPE -> {
+                LockType(
+                    onBackClick = { subDestination = AppLockSubDestination.MENU_HOME },
+                )
+            }
+            AppLockSubDestination.APP_LOCK -> {
+                AppLock(
+                    onBackClick = { subDestination = AppLockSubDestination.MENU_HOME },
+                )
+            }
+            AppLockSubDestination.HIDE_APP -> {
+                HideApp(
+                    onBackClick = { subDestination = AppLockSubDestination.MENU_HOME },
+                )
+            }
         }
     }
 }
@@ -285,8 +338,6 @@ fun AppLockHideHomePreview() {
     SylvenSecureTheme {
         AppLockHideHome(
             onBackClick = {},
-            onLockTypeClick = {},
-            onAppLockClick = {},
-        ) {}
+        )
     }
 }

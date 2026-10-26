@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
@@ -55,7 +55,7 @@ import androidx.compose.ui.unit.sp
 import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
-// Hide App Screen matching the project auto-theme and grouped card styling
+// Hide App Screen matching screenshot UI and project auto-theme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HideApp(
@@ -117,14 +117,13 @@ fun HideApp(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .padding(horizontal = 20.dp, vertical = 12.dp),
         ) {
-            // Search Bar
+            // Search Input Bar
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { query -> searchQuery = query },
-                placeholder = { Text("Search apps to hide...") },
+                placeholder = { Text("Search apps") },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -135,7 +134,7 @@ fun HideApp(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                shape = RoundedCornerShape(18.dp),
+                shape = RoundedCornerShape(24.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF8B5CF6),
                     unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -146,17 +145,22 @@ fun HideApp(
 
             // Grouped Card Surface for Real Apps
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-                    filteredApps.forEachIndexed { index, app ->
+                    itemsIndexed(
+                        items = filteredApps,
+                        key = { _, app -> app.packageName },
+                    ) { index, app ->
                         val isHidden = hiddenStateMap[app.packageName] ?: false
 
                         HideAppRow(
@@ -200,7 +204,7 @@ fun HideAppRow(
         ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
                     .background(
                         if (isHidden) Color(0xFF8B5CF6).copy(alpha = 0.15f)

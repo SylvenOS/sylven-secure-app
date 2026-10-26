@@ -51,7 +51,7 @@ import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 import kotlin.math.hypot
 
-// 2-Step Pattern Lock Creation & Verification Screen
+// 2-Step Pattern Lock Creation & Verification Screen with refined thin vector lines and simplified nodes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatternSetupScreen(
@@ -189,9 +189,11 @@ fun PatternSetupScreen(
                 ) { pattern -> onPatternCompleted(pattern) }
             }
 
-            // Clear Button
+            // Clear Button resets back to Step 1 immediately
             Button(
                 onClick = {
+                    firstStepPattern = emptyList()
+                    isConfirmStep = false
                     errorMessage = ""
                     resetTrigger++
                 },
@@ -209,7 +211,7 @@ fun PatternSetupScreen(
     }
 }
 
-// 3x3 Interactive Pattern Canvas
+// 3x3 Interactive Pattern Canvas with simplified dot nodes and thin vector line
 @Composable
 fun PatternGridCanvas(
     resetTrigger: Int,
@@ -219,7 +221,7 @@ fun PatternGridCanvas(
     var currentTouchPoint by remember(resetTrigger) { mutableStateOf<Offset?>(null) }
 
     val activeLineColor = BluePrimary
-    val dotColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+    val dotColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
     val activeDotColor = BluePrimary
 
     Canvas(
@@ -270,6 +272,9 @@ fun PatternGridCanvas(
             )
         }
 
+        // Refined thin stroke width (3.5dp) matching reference snapshot
+        val lineStrokePx = 3.5.dp.toPx()
+
         // Draw connecting lines between selected nodes
         if (selectedNodes.isNotEmpty()) {
             val path = Path().apply {
@@ -284,7 +289,7 @@ fun PatternGridCanvas(
             drawPath(
                 path = path,
                 color = activeLineColor,
-                style = Stroke(width = 12.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
+                style = Stroke(width = lineStrokePx, cap = StrokeCap.Round, join = StrokeJoin.Round),
             )
 
             // Draw line to current touch drag point
@@ -294,36 +299,20 @@ fun PatternGridCanvas(
                     color = activeLineColor,
                     start = lastNodePos,
                     end = touchPos,
-                    strokeWidth = 12.dp.toPx(),
+                    strokeWidth = lineStrokePx,
                     cap = StrokeCap.Round,
                 )
             }
         }
 
-        // Draw 9 grid dot nodes
+        // Draw 9 simplified grid dot nodes
         nodeCenters.forEachIndexed { index, center ->
             val isSelected = selectedNodes.contains(index)
-            if (isSelected) {
-                // Active outer ring
-                drawCircle(
-                    color = activeDotColor.copy(alpha = 0.2f),
-                    radius = 32.dp.toPx(),
-                    center = center,
-                )
-                // Active center circle
-                drawCircle(
-                    color = activeDotColor,
-                    radius = 12.dp.toPx(),
-                    center = center,
-                )
-            } else {
-                // Inactive dot node
-                drawCircle(
-                    color = dotColor,
-                    radius = 8.dp.toPx(),
-                    center = center,
-                )
-            }
+            drawCircle(
+                color = if (isSelected) activeDotColor else dotColor,
+                radius = if (isSelected) 5.dp.toPx() else 4.dp.toPx(),
+                center = center,
+            )
         }
     }
 }
