@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.sylvenos.tools.ui.applock.AppLockHideHome
 import com.sylvenos.tools.ui.applock.LockSecurityManager
+import com.sylvenos.tools.ui.applock.LockVerificationScreen
 import com.sylvenos.tools.ui.applock.PinSetupScreen
 import com.sylvenos.tools.ui.permission.PermissionScreen
 import com.sylvenos.tools.ui.permission.hasAllRequiredPermissions
@@ -64,6 +65,7 @@ enum class MainAppDestination {
     HOME,
     PERMISSION,
     FIRST_TIME_PIN_SETUP,
+    LOCK_VERIFICATION,
     APP_LOCK_HIDE_HOME,
 }
 
@@ -138,7 +140,7 @@ fun SylvenOSApp() {
                         } else if (!LockSecurityManager.isLockSet(context)) {
                             navigateTo(MainAppDestination.FIRST_TIME_PIN_SETUP)
                         } else {
-                            navigateTo(MainAppDestination.APP_LOCK_HIDE_HOME)
+                            navigateTo(MainAppDestination.LOCK_VERIFICATION)
                         }
                     }
                 }
@@ -151,12 +153,22 @@ fun SylvenOSApp() {
                         if (!LockSecurityManager.isLockSet(context)) {
                             navigateTo(MainAppDestination.FIRST_TIME_PIN_SETUP)
                         } else {
-                            navigateTo(MainAppDestination.APP_LOCK_HIDE_HOME)
+                            navigateTo(MainAppDestination.LOCK_VERIFICATION)
                         }
                     }
                 }
                 MainAppDestination.FIRST_TIME_PIN_SETUP -> {
                     PinSetupScreen(
+                        onBackClick = { navigateBack() },
+                    ) {
+                        if (backStack.isNotEmpty()) {
+                            backStack.removeAt(backStack.lastIndex)
+                        }
+                        navigateTo(MainAppDestination.APP_LOCK_HIDE_HOME)
+                    }
+                }
+                MainAppDestination.LOCK_VERIFICATION -> {
+                    LockVerificationScreen(
                         onBackClick = { navigateBack() },
                     ) {
                         if (backStack.isNotEmpty()) {

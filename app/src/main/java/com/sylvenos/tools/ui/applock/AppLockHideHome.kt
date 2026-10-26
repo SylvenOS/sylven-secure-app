@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -66,11 +67,18 @@ enum class AppLockSubDestination {
 fun AppLockHideHome(
     onBackClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     var subDestination by remember { mutableStateOf(AppLockSubDestination.MENU_HOME) }
 
     // Intercept system back button / side swipe gesture when inside a sub-screen
     BackHandler(enabled = (subDestination != AppLockSubDestination.MENU_HOME)) {
         subDestination = AppLockSubDestination.MENU_HOME
+    }
+
+    val activeLockName = when (LockSecurityManager.getLockType(context)) {
+        LockTypeOption.PATTERN -> "Pattern"
+        LockTypeOption.PIN -> "PIN"
+        LockTypeOption.PASSWORD -> "Password"
     }
 
     Crossfade(
@@ -117,10 +125,10 @@ fun AppLockHideHome(
                             .padding(horizontal = 20.dp, vertical = 20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        // Option 1: Lock Type
+                        // Option 1: Lock Type (Displays currently active lock)
                         OptionCard(
                             title = "Lock Type",
-                            description = "Change lock types",
+                            description = "Change lock types - Active $activeLockName",
                             icon = Icons.Outlined.Lock,
                             accentColor = BluePrimary,
                         ) {
