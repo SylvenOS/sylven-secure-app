@@ -20,7 +20,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.sylvenos.tools.ui.applock.AppLock
 import com.sylvenos.tools.ui.applock.AppLockHideHome
 import com.sylvenos.tools.ui.applock.HideApp
+import com.sylvenos.tools.ui.applock.LockSecurityManager
 import com.sylvenos.tools.ui.applock.LockType
+import com.sylvenos.tools.ui.applock.PinSetupScreen
 import com.sylvenos.tools.ui.home.HomeScreen
 import com.sylvenos.tools.ui.permission.PermissionScreen
 import com.sylvenos.tools.ui.permission.hasAllRequiredPermissions
@@ -31,6 +33,7 @@ enum class AppDestination {
     SPLASH,
     HOME,
     PERMISSION,
+    PIN_SETUP,
     APP_LOCK_HIDE_HOME,
     LOCK_TYPE,
     APP_LOCK,
@@ -103,16 +106,32 @@ fun SylvenOSApp() {
                 AppDestination.HOME -> {
                     HomeScreen {
                         // Clicking "App Lock and Hide" -> Check 3 required permissions
-                        if (hasAllRequiredPermissions(context)) {
-                            navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
-                        } else {
+                        if (!hasAllRequiredPermissions(context)) {
                             navigateTo(AppDestination.PERMISSION)
+                        } else if (!LockSecurityManager.isPinSet(context)) {
+                            navigateTo(AppDestination.PIN_SETUP)
+                        } else {
+                            navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
                         }
                     }
                 }
                 AppDestination.PERMISSION -> {
                     PermissionScreen {
-                        // Once all 3 permissions allowed -> Replace PERMISSION with APP_LOCK_HIDE_HOME
+                        // Once all 3 permissions allowed -> Check if PIN is set
+                        if (backStack.isNotEmpty()) {
+                            backStack.removeAt(backStack.lastIndex)
+                        }
+                        if (!LockSecurityManager.isPinSet(context)) {
+                            navigateTo(AppDestination.PIN_SETUP)
+                        } else {
+                            navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
+                        }
+                    }
+                }
+                AppDestination.PIN_SETUP -> {
+                    PinSetupScreen(
+                        onBackClick = { navigateBack() },
+                    ) {
                         if (backStack.isNotEmpty()) {
                             backStack.removeAt(backStack.lastIndex)
                         }
