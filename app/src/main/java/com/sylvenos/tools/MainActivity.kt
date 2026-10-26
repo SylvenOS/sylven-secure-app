@@ -23,6 +23,7 @@ import com.sylvenos.tools.ui.applock.HideApp
 import com.sylvenos.tools.ui.applock.LockSecurityManager
 import com.sylvenos.tools.ui.applock.LockType
 import com.sylvenos.tools.ui.applock.LockTypeOption
+import com.sylvenos.tools.ui.applock.PasswordSetupScreen
 import com.sylvenos.tools.ui.applock.PatternSetupScreen
 import com.sylvenos.tools.ui.applock.PinSetupScreen
 import com.sylvenos.tools.ui.home.HomeScreen
@@ -37,6 +38,7 @@ enum class AppDestination {
     PERMISSION,
     PIN_SETUP,
     PATTERN_SETUP,
+    PASSWORD_SETUP,
     APP_LOCK_HIDE_HOME,
     LOCK_TYPE,
     APP_LOCK,
@@ -112,10 +114,10 @@ fun SylvenOSApp() {
                         if (!hasAllRequiredPermissions(context)) {
                             navigateTo(AppDestination.PERMISSION)
                         } else if (!LockSecurityManager.isLockSet(context)) {
-                            if (LockSecurityManager.getLockType(context) == LockTypeOption.PATTERN) {
-                                navigateTo(AppDestination.PATTERN_SETUP)
-                            } else {
-                                navigateTo(AppDestination.PIN_SETUP)
+                            when (LockSecurityManager.getLockType(context)) {
+                                LockTypeOption.PATTERN -> navigateTo(AppDestination.PATTERN_SETUP)
+                                LockTypeOption.PASSWORD -> navigateTo(AppDestination.PASSWORD_SETUP)
+                                else -> navigateTo(AppDestination.PIN_SETUP)
                             }
                         } else {
                             navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
@@ -129,10 +131,10 @@ fun SylvenOSApp() {
                             backStack.removeAt(backStack.lastIndex)
                         }
                         if (!LockSecurityManager.isLockSet(context)) {
-                            if (LockSecurityManager.getLockType(context) == LockTypeOption.PATTERN) {
-                                navigateTo(AppDestination.PATTERN_SETUP)
-                            } else {
-                                navigateTo(AppDestination.PIN_SETUP)
+                            when (LockSecurityManager.getLockType(context)) {
+                                LockTypeOption.PATTERN -> navigateTo(AppDestination.PATTERN_SETUP)
+                                LockTypeOption.PASSWORD -> navigateTo(AppDestination.PASSWORD_SETUP)
+                                else -> navigateTo(AppDestination.PIN_SETUP)
                             }
                         } else {
                             navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
@@ -151,6 +153,16 @@ fun SylvenOSApp() {
                 }
                 AppDestination.PATTERN_SETUP -> {
                     PatternSetupScreen(
+                        onBackClick = { navigateBack() },
+                    ) {
+                        if (backStack.isNotEmpty()) {
+                            backStack.removeAt(backStack.lastIndex)
+                        }
+                        navigateTo(AppDestination.APP_LOCK_HIDE_HOME)
+                    }
+                }
+                AppDestination.PASSWORD_SETUP -> {
+                    PasswordSetupScreen(
                         onBackClick = { navigateBack() },
                     ) {
                         if (backStack.isNotEmpty()) {
@@ -179,7 +191,9 @@ fun SylvenOSApp() {
                             LockTypeOption.PIN -> {
                                 navigateTo(AppDestination.PIN_SETUP)
                             }
-                            else -> {}
+                            LockTypeOption.PASSWORD -> {
+                                navigateTo(AppDestination.PASSWORD_SETUP)
+                            }
                         }
                     }
                 }
