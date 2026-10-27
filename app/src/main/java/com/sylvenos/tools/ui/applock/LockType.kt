@@ -1,4 +1,4 @@
-package com.sylvenos.tools.ui.applock
+﻿package com.sylvenos.tools.ui.applock
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,8 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,7 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -70,8 +66,6 @@ fun LockType(
     val context = LocalContext.current
     var activeMode by remember { mutableStateOf(LockSetupMode.MENU) }
     var selectedOption by remember { mutableStateOf(LockSecurityManager.getLockType(context)) }
-    var isFaceEnabled by remember { mutableStateOf(value = false) }
-    var isFingerprintEnabled by remember { mutableStateOf(value = false) }
 
     // Intercept system back button / side swipe gesture when inside a sub setup screen
     BackHandler(enabled = (activeMode != LockSetupMode.MENU)) {
@@ -169,42 +163,27 @@ fun LockType(
                                     activeMode = LockSetupMode.PASSWORD_SETUP
                                 }
 
-                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
-
-                                // Face Biometric Toggle Row
-                                LockTypeSwitchRow(
-                                    title = "Face",
-                                    isChecked = isFaceEnabled,
-                                ) { isFaceEnabled = it }
-
-                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
-
-                                // Fingerprints Biometric Toggle Row
-                                LockTypeSwitchRow(
-                                    title = "Fingerprints",
-                                    isChecked = isFingerprintEnabled,
-                                ) { isFingerprintEnabled = it }
                             }
                         }
                     }
                 }
             }
             LockSetupMode.PIN_SETUP -> {
-                PinSetupScreen(
+                PinSetup(
                     onBackClick = { activeMode = LockSetupMode.MENU },
                 ) {
                     activeMode = LockSetupMode.MENU
                 }
             }
             LockSetupMode.PATTERN_SETUP -> {
-                PatternSetupScreen(
+                PatternSetup(
                     onBackClick = { activeMode = LockSetupMode.MENU },
                 ) {
                     activeMode = LockSetupMode.MENU
                 }
             }
             LockSetupMode.PASSWORD_SETUP -> {
-                PasswordSetupScreen(
+                PasswordSetup(
                     onBackClick = { activeMode = LockSetupMode.MENU },
                 ) {
                     activeMode = LockSetupMode.MENU
@@ -251,39 +230,6 @@ fun LockTypeRow(
     }
 }
 
-// Individual Biometric Switch Row
-@Composable
-fun LockTypeSwitchRow(
-    title: String,
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(
-            text = title,
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-
-        Switch(
-            checked = isChecked,
-            onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = BluePrimary,
-                uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

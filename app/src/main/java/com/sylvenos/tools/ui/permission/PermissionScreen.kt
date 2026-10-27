@@ -100,14 +100,14 @@ fun requestDisableBatteryOptimization(context: Context) {
     }
 }
 
-// Checks if all 3 required permissions for App Lock are granted
+// Checks if all required permissions for App Lock are granted
 fun hasAllRequiredPermissions(context: Context): Boolean {
     return hasUsageAccessPermission(context) &&
             hasOverlayPermission(context) &&
             isBatteryOptimizationIgnored(context)
 }
 
-// Permission Required Screen
+// Permission Required Screen managing essential system permissions
 @Composable
 fun PermissionScreen(
     onAllPermissionsGranted: () -> Unit,
@@ -172,7 +172,7 @@ fun PermissionScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "To protect your apps, S-Secure requires system permissions. Allow all to continue.",
+                    text = "To protect your apps, Sylven Secure requires system permissions. Allow all to continue.",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -183,7 +183,7 @@ fun PermissionScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 3 Permission Cards
+                // Permission Cards
                 Column(
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -224,7 +224,7 @@ fun PermissionScreen(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
-            // Bottom Action Button: Continue to App (Disabled until ALL 3 granted)
+            // Bottom Action Button: Continue to App (Disabled until all permissions granted)
             Button(
                 onClick = {
                     if (areAllPermissionsGranted) {
@@ -262,6 +262,11 @@ fun PermissionCard(
     onAllowClick: () -> Unit,
 ) {
     Card(
+        onClick = {
+            if (!isGranted) {
+                onAllowClick()
+            }
+        },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(

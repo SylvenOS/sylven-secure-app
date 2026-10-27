@@ -39,7 +39,7 @@ class AppLockOverlayActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    LockVerificationScreen(
+                    LockVerification(
                         showTopBar = false,
                         onBackClick = {
                             val homeIntent = Intent(Intent.ACTION_MAIN).apply {

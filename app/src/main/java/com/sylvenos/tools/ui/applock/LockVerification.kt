@@ -61,7 +61,7 @@ import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 // Lock Verification Screen verifying active lock (PIN, Pattern, Password)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LockVerificationScreen(
+fun LockVerification(
     showTopBar: Boolean = true,
     onBackClick: () -> Unit,
     onUnlocked: () -> Unit,
@@ -229,7 +229,7 @@ fun LockVerificationScreen(
                                         .clip(CircleShape)
                                         .background(
                                             if (isFilled) BluePrimary
-                                            else MaterialTheme.colorScheme.surfaceVariant,
+                                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                                         ),
                                 )
                             }
@@ -351,6 +351,6 @@ fun LockVerificationScreen(
 @Composable
 fun LockVerificationPreview() {
     SylvenSecureTheme {
-        LockVerificationScreen(onBackClick = {}) {}
+        LockVerification(onBackClick = {}) {}
     }
 }

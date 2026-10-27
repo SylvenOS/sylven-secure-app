@@ -1,4 +1,4 @@
-package com.sylvenos.tools.ui.applock
+﻿package com.sylvenos.tools.ui.applock
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -123,7 +123,4 @@ object LockSecurityManager {
         }
     }
 
-    fun isPackageLocked(context: Context, packageName: String): Boolean {
-        return getLockedPackages(context).contains(packageName)
-    }
 }
