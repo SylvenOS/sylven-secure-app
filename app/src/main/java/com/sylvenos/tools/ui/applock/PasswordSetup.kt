@@ -71,7 +71,7 @@ private fun validatePasswordInput(password: String): String? {
 // 2-Step Password Lock Creation & Verification Screen with transparent input field container
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordSetupScreen(
+fun PasswordSetup(
     onBackClick: () -> Unit,
     onPasswordCreated: () -> Unit,
 ) {
@@ -267,6 +267,6 @@ fun PasswordSetupScreen(
 @Composable
 fun PasswordSetupPreview() {
     SylvenSecureTheme {
-        PasswordSetupScreen(onBackClick = {}) {}
+        PasswordSetup(onBackClick = {}) {}
     }
 }

@@ -35,7 +35,7 @@
         <activity
             android:name=".ui.applock.AppLockOverlayActivity"
             android:exported="false"
-            android:taskAffinity=""
+            android:taskAffinity="com.sylvenos.tools.overlay"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:launchMode="singleInstance"

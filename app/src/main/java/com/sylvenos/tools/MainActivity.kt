@@ -51,11 +51,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.sylvenos.tools.ui.applock.AppLockHideHome
+import com.sylvenos.tools.ui.applock.AppLockHome
 import com.sylvenos.tools.ui.applock.AppLockService
 import com.sylvenos.tools.ui.applock.LockSecurityManager
-import com.sylvenos.tools.ui.applock.LockVerificationScreen
-import com.sylvenos.tools.ui.applock.PinSetupScreen
+import com.sylvenos.tools.ui.applock.LockVerification
+import com.sylvenos.tools.ui.applock.PinSetup
 import com.sylvenos.tools.ui.permission.PermissionScreen
 import com.sylvenos.tools.ui.permission.hasAllRequiredPermissions
 import com.sylvenos.tools.ui.splash.SplashScreen
@@ -68,7 +68,7 @@ enum class MainAppDestination {
     PERMISSION,
     FIRST_TIME_PIN_SETUP,
     LOCK_VERIFICATION,
-    APP_LOCK_HIDE_HOME,
+    APP_LOCK_HOME,
 }
 
 class MainActivity : ComponentActivity() {
@@ -90,8 +90,10 @@ fun SylvenOSApp() {
 
     // Ensure background service is running when locked packages exist
     LaunchedEffect(Unit) {
-        if (hasAllRequiredPermissions(context) && LockSecurityManager.getLockedPackages(context).isNotEmpty()) {
-            AppLockService.startService(context)
+        if (hasAllRequiredPermissions(context)) {
+            if (LockSecurityManager.getLockedPackages(context).isNotEmpty()) {
+                AppLockService.startService(context)
+            }
         }
     }
 
@@ -143,7 +145,7 @@ fun SylvenOSApp() {
                 }
                 MainAppDestination.HOME -> {
                     HomeScreen {
-                        // Clicking "App Lock and Hide" -> Check 3 required permissions
+                        // Clicking "App Lock" -> Check required permissions
                         if (!hasAllRequiredPermissions(context)) {
                             navigateTo(MainAppDestination.PERMISSION)
                         } else if (!LockSecurityManager.isLockSet(context)) {
@@ -155,7 +157,7 @@ fun SylvenOSApp() {
                 }
                 MainAppDestination.PERMISSION -> {
                     PermissionScreen {
-                        // Once all 3 permissions allowed -> Check if lock is set
+                        // Once permissions allowed -> Check if lock is set
                         if (backStack.isNotEmpty()) {
                             backStack.removeAt(backStack.lastIndex)
                         }
@@ -167,52 +169,53 @@ fun SylvenOSApp() {
                     }
                 }
                 MainAppDestination.FIRST_TIME_PIN_SETUP -> {
-                    PinSetupScreen(
+                    PinSetup(
                         onBackClick = { navigateBack() },
                     ) {
                         if (backStack.isNotEmpty()) {
                             backStack.removeAt(backStack.lastIndex)
                         }
-                        navigateTo(MainAppDestination.APP_LOCK_HIDE_HOME)
+                        navigateTo(MainAppDestination.APP_LOCK_HOME)
                     }
                 }
                 MainAppDestination.LOCK_VERIFICATION -> {
-                    LockVerificationScreen(
+                    LockVerification(
                         onBackClick = { navigateBack() },
                     ) {
                         if (backStack.isNotEmpty()) {
                             backStack.removeAt(backStack.lastIndex)
                         }
-                        navigateTo(MainAppDestination.APP_LOCK_HIDE_HOME)
+                        navigateTo(MainAppDestination.APP_LOCK_HOME)
                     }
                 }
-                MainAppDestination.APP_LOCK_HIDE_HOME -> {
-                    AppLockHideHome { navigateBack() }
+                MainAppDestination.APP_LOCK_HOME -> {
+                    AppLockHome { navigateBack() }
                 }
             }
         }
     }
 }
 
-// Main Home Screen Dashboard for Sylven Tools
+// Main Home Screen Dashboard for Sylven Secure
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onAppLockHideClick: () -> Unit,
+    onAppLockClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Row(
-                        verticalAlignment = Alignment.Bottom,
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start,
                     ) {
                         Text(
-                            text = "Sylven Tools",
+                            text = "Sylven Secure",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.alignByBaseline(),
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
@@ -220,7 +223,7 @@ fun HomeScreen(
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
                             color = BluePrimary,
-                            modifier = Modifier.padding(bottom = 2.dp),
+                            modifier = Modifier.alignByBaseline(),
                         )
                     }
                 },
@@ -240,13 +243,13 @@ fun HomeScreen(
                 .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // App Lock and Hide
+            // App Lock
             HomeFeatureCard(
-                title = "App Lock and Hide",
+                title = "App Lock",
                 description = "",
                 icon = Icons.Default.Lock,
                 accentColor = BluePrimary,
-                onClick = onAppLockHideClick,
+                onClick = onAppLockClick,
             )
 
             // WiFi Security - Planned

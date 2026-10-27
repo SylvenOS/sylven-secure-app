@@ -42,15 +42,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sylvenos.tools.R
 import com.sylvenos.tools.ui.theme.BluePrimary
 import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 
@@ -58,13 +55,12 @@ enum class AppLockSubDestination {
     MENU_HOME,
     LOCK_TYPE,
     APP_LOCK,
-    HIDE_APP,
 }
 
-// AppLockHideHome Feature Container managing sub-screens (LOCK_TYPE, APP_LOCK, HIDE_APP)
+// AppLockHome Feature Container managing sub-screens (LOCK_TYPE, APP_LOCK)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppLockHideHome(
+fun AppLockHome(
     onBackClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -87,7 +83,7 @@ fun AppLockHideHome(
             durationMillis = 250,
             easing = FastOutSlowInEasing,
         ),
-        label = "AppLockHideSubCrossfade",
+        label = "AppLockSubCrossfade",
     ) { destination ->
         when (destination) {
             AppLockSubDestination.MENU_HOME -> {
@@ -96,7 +92,7 @@ fun AppLockHideHome(
                         TopAppBar(
                             title = {
                                 Text(
-                                    text = "App Lock & Hide",
+                                    text = "App Lock",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -144,16 +140,6 @@ fun AppLockHideHome(
                         ) {
                             subDestination = AppLockSubDestination.APP_LOCK
                         }
-
-                        // Option 3: Hide App
-                        OptionCardWithPainter(
-                            title = "Hide App",
-                            description = "Hide/Unhide Apps",
-                            painter = painterResource(id = R.drawable.ic_hide_app),
-                            accentColor = Color(0xFF8B5CF6),
-                        ) {
-                            subDestination = AppLockSubDestination.HIDE_APP
-                        }
                     }
                 }
             }
@@ -164,11 +150,6 @@ fun AppLockHideHome(
             }
             AppLockSubDestination.APP_LOCK -> {
                 AppLock {
-                    subDestination = AppLockSubDestination.MENU_HOME
-                }
-            }
-            AppLockSubDestination.HIDE_APP -> {
-                HideApp {
                     subDestination = AppLockSubDestination.MENU_HOME
                 }
             }
@@ -255,89 +236,10 @@ fun OptionCard(
     }
 }
 
-// Individual Option Card Item with Painter and clipped rounded corners for touch feedback
-@Composable
-fun OptionCardWithPainter(
-    title: String,
-    description: String,
-    painter: Painter,
-    accentColor: Color,
-    onClick: () -> Unit,
-) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f),
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = accentColor.copy(alpha = 0.12f),
-                    modifier = Modifier.size(48.dp),
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        Icon(
-                            painter = painter,
-                            contentDescription = title,
-                            tint = accentColor,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column {
-                    Text(
-                        text = title,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = description,
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 18.sp,
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Arrow Right",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
-fun AppLockHideHomePreview() {
+fun AppLockHomePreview() {
     SylvenSecureTheme {
-        AppLockHideHome {}
+        AppLockHome {}
     }
 }

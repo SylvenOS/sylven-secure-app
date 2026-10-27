@@ -1,4 +1,4 @@
-package com.sylvenos.tools.ui.applock
+﻿package com.sylvenos.tools.ui.applock
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -19,7 +19,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
-// Foreground Service monitoring locked apps at ~10ms interval
+// Standalone Foreground Service monitoring ONLY locked apps at ~10ms interval
 class AppLockService : Service() {
 
     private val serviceScope = CoroutineScope(Dispatchers.Default + Job())
@@ -50,7 +50,7 @@ class AppLockService : Service() {
         super.onCreate()
         createNotificationChannel()
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Sylven Tools Protection Active")
+            .setContentTitle("Sylven Lock Protection Active")
             .setContentText("App Lock is running in the background")
             .setSmallIcon(R.drawable.ic_splash_logo)
             .setOngoing(true)
@@ -97,12 +97,12 @@ class AppLockService : Service() {
         }
     }
 
-    // Query current foreground application using UsageStatsManager with fast 50ms window
+    // Query current foreground application using UsageStatsManager with reliable 3-second window
     private fun getForegroundAppPackage(context: Context): String? {
         val manager = context.getSystemService(USAGE_STATS_SERVICE) as? UsageStatsManager
         val usageStatsManager = manager ?: return null
         val time = System.currentTimeMillis()
-        val events = usageStatsManager.queryEvents(time - 50, time)
+        val events = usageStatsManager.queryEvents(time - 3000, time)
         var foregroundPackage: String? = null
         val event = UsageEvents.Event()
 
@@ -120,9 +120,8 @@ class AppLockService : Service() {
         val intent = Intent(applicationContext, AppLockOverlayActivity::class.java).apply {
             addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or
                         Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
+                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
                         Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS or
                         Intent.FLAG_ACTIVITY_NO_ANIMATION,
             )

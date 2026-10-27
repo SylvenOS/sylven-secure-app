@@ -47,7 +47,7 @@ import com.sylvenos.tools.ui.theme.SylvenSecureTheme
 // 2-Step 4-Digit PIN Creation & Verification Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PinSetupScreen(
+fun PinSetup(
     onBackClick: () -> Unit,
     onPinCreated: () -> Unit,
 ) {
@@ -193,7 +193,7 @@ fun PinSetupScreen(
                                 .clip(CircleShape)
                                 .background(
                                     if (isFilled) BluePrimary
-                                    else MaterialTheme.colorScheme.surfaceVariant,
+                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                                 ),
                         )
                     }
@@ -288,6 +288,6 @@ fun KeypadButton(
 @Composable
 fun PinSetupPreview() {
     SylvenSecureTheme {
-        PinSetupScreen(onBackClick = {}) {}
+        PinSetup(onBackClick = {}) {}
     }
 }
