@@ -1,55 +1,55 @@
+name: Security Audit
 
-# Security Policy
+on:
+  workflow_call:
 
-## Reporting a Vulnerability
+  schedule:
+    - cron: '0 6 * * 1'
 
-The security of SylvenOS projects is important to us.
+  push:
+    branches:
+      - main
 
-If you discover a security vulnerability, please do not create a public issue.
+  pull_request:
+    branches:
+      - main
 
-Instead:
+jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    name: Dependency Review
+    runs-on: ubuntu-latest
 
-- Open a [private security advisory](https://github.com/sylvenos/sylvenos-web/security/advisories/new) on GitHub, or
-- Email [contact@sylvenos.com](mailto:contact@sylvenos.com) with details.
+    permissions:
+      contents: read
+      pull-requests: read
 
----
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-## What to Include
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
 
-Please provide:
+  gradle-dependency-submission:
+    name: Gradle Dependency Submission
+    runs-on: ubuntu-latest
 
-- Vulnerability description
-- Steps to reproduce
-- Impact assessment
-- Screenshots or proof of concept
-- Suggested mitigation (if known)
+    permissions:
+      contents: write
 
----
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-## Response Process
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-Maintainers will:
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-1. Acknowledge the report.
-2. Verify the issue.
-3. Develop a fix.
-4. Coordinate responsible disclosure.
-
----
-
-## Scope
-
-This policy applies to:
-
-- SylvenOS repositories
-- GitHub Actions workflows
-- Deployment configurations
-- Dependencies maintained within SylvenOS projects
-
----
-
-## Responsible Disclosure
-
-Please allow maintainers reasonable time to investigate and resolve issues before public disclosure.
-
-We appreciate researchers and contributors who help keep the community secure.
+      - name: Submit Gradle dependency graph
+        uses: gradle/actions/dependency-submission@v4
