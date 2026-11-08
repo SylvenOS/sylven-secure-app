@@ -1,0 +1,71 @@
+
+name: Bug Report
+description: Report any issues with the platform
+title: "[BUG]: "
+labels:
+  - "🐛 bug"
+
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Found a bug? Please fill out the sections below. 👍
+
+  - type: textarea
+    id: issue_summary
+    attributes:
+      label: Issue Summary
+      description: A clear and detailed summary of the issue.
+      placeholder: Describe the bug...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Tell us exactly how to reproduce the issue.
+      placeholder: |
+        1. Go to...
+        2. Click on...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_results
+    attributes:
+      label: Actual Results
+      description: What is happening right now?
+      placeholder: Describe the current behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_results
+    attributes:
+      label: Expected Results
+      description: What should happen instead?
+      placeholder: Describe the expected behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical_details
+    attributes:
+      label: Technical Details
+      description: Browser, OS, Node version, logs, console errors, network requests, etc.
+      placeholder: |
+        Browser:
+        OS:
+        Node.js:
+        Console Errors:
+        Network Requests:
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Screenshots, videos, logs, test results, or other proof.
+      placeholder: Attach screenshots, recordings, or logs here.

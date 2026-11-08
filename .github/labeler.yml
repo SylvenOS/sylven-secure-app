@@ -1,0 +1,13 @@
+android:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.kt'
+compose:
+  - changed-files:
+      - any-glob-to-any-file: '**/*Compose*.kt'
+gradle:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.gradle'
+      - any-glob-to-any-file: '**/*.gradle.kts'
+workflow:
+  - changed-files:
+      - any-glob-to-any-file: '.github/workflows/**'
