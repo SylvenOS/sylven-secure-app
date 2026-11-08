@@ -1,4 +1,4 @@
-package com.sylvenos.tools.ui.applock
+﻿package com.sylvenos.tools.ui.applock
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -11,6 +11,7 @@ object LockSecurityManager {
     private const val KEY_PIN = "key_app_lock_pin"
     private const val KEY_PATTERN = "key_app_lock_pattern"
     private const val KEY_PASSWORD = "key_app_lock_password"
+    private const val KEY_LOCKED_PACKAGES = "key_locked_packages_set"
 
     private fun getPreferences(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -96,4 +97,30 @@ object LockSecurityManager {
     fun getPassword(context: Context): String? {
         return getPreferences(context).getString(KEY_PASSWORD, null)
     }
+
+    // Locked Package Methods
+    fun getLockedPackages(context: Context): Set<String> {
+        return getPreferences(context).getStringSet(KEY_LOCKED_PACKAGES, emptySet()) ?: emptySet()
+    }
+
+    fun addLockedPackage(context: Context, packageName: String) {
+        val currentSet = getLockedPackages(context).toMutableSet()
+        currentSet.add(packageName)
+        getPreferences(context).edit {
+            putStringSet(KEY_LOCKED_PACKAGES, currentSet)
+        }
+        AppLockService.startService(context)
+    }
+
+    fun removeLockedPackage(context: Context, packageName: String) {
+        val currentSet = getLockedPackages(context).toMutableSet()
+        currentSet.remove(packageName)
+        getPreferences(context).edit {
+            putStringSet(KEY_LOCKED_PACKAGES, currentSet)
+        }
+        if (currentSet.isEmpty()) {
+            AppLockService.stopService(context)
+        }
+    }
+
 }

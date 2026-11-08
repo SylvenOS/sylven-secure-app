@@ -54,7 +54,7 @@ import kotlin.math.hypot
 // 2-Step Pattern Lock Creation & Verification Screen with refined thin vector lines and simplified nodes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PatternSetupScreen(
+fun PatternSetup(
     onBackClick: () -> Unit,
     onPatternCreated: () -> Unit,
 ) {
@@ -341,6 +341,6 @@ private fun findHitNode(touch: Offset, width: Float, height: Float): Int {
 @Composable
 fun PatternSetupPreview() {
     SylvenSecureTheme {
-        PatternSetupScreen(onBackClick = {}) {}
+        PatternSetup(onBackClick = {}) {}
     }
 }

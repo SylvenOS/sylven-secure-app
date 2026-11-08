@@ -1,0 +1,11 @@
+
+blank_issues_enabled: false
+
+contact_links:
+  - name: 🙋 Questions & Support
+    url: https://github.com/SylvenOS/SylvenOS-Web/discussions
+    about: Need help self-hosting or have a general question about SylvenOS-Web? Open a discussion
+
+  # - name: 📚 Documentation
+  #   url: https://sylvenos.com/docs
+  #   about: Read the docs before opening an issue.
