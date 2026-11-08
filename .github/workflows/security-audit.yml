@@ -15,7 +15,7 @@ jobs:
       pull-requests: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/dependency-review-action@v4
+      - uses: actions/dependency-review-action@v5
   gradle-dependency-submission:
     runs-on: ubuntu-latest
     permissions:
